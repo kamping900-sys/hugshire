@@ -1,0 +1,15 @@
+node_modules/
+.next/
+out/
+coverage/
+.env
+.env.*
+!.env.example
+*.log
+.data/
+uploads/
+test-results/
+playwright-report/
+contracts/vault/target/
+next-env.d.ts
+*.tsbuildinfo

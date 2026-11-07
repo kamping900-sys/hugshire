@@ -1,0 +1,56 @@
+{
+  "name": "hugshire",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Hugshire - where kindness takes shape. Yield-funded charitable support in a cozy 2D world.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev -p 3200",
+    "build": "next build",
+    "start": "next start -p 3200",
+    "worker": "tsx --env-file-if-exists=.env.local src/worker/index.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx --env-file-if-exists=.env.local scripts/migrate.ts",
+    "db:seed": "tsx --env-file-if-exists=.env.local scripts/seed-sandbox.ts",
+    "contract:test": "cd contracts/vault && cargo test",
+    "contract:build": "cd contracts/vault && cargo build --target wasm32-unknown-unknown --release",
+    "verify:live": "tsx --env-file-if-exists=.env.local scripts/verify-live.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.1164.0",
+    "@coinbase/cdp-sdk": "1.61.0",
+    "@electric-sql/pglite": "0.5.15",
+    "@near-js/crypto": "2.5.1",
+    "@near-js/transactions": "2.5.1",
+    "@near-js/utils": "2.5.1",
+    "drizzle-orm": "0.45.4",
+    "jose": "6.2.15",
+    "next": "16.4.5",
+    "pg": "8.23.1",
+    "pixi.js": "8.22.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "server-only": "0.0.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0",
+    "@tailwindcss/postcss": "4.3.5",
+    "@types/node": "22.20.5",
+    "@types/pg": "8.23.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "drizzle-kit": "0.31.11",
+    "tailwindcss": "4.3.5",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vitest": "5.1.0"
+  }
+}

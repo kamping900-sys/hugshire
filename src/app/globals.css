@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+/* Hugshire design tokens: warm orange on cream, soft brown ink. Green is reserved for small success cues. */
+@theme {
+  --color-orange: #f58a3c;
+  --color-orange-deep: #e67624;
+  --color-orange-soft: #fde6d4;
+  --color-cream: #fff8f0;
+  --color-paper: #ffffff;
+  --color-peach: #ffd7bd;
+  --color-butter: #f6c76c;
+  --color-butter-soft: #fdf0cf;
+  --color-ink: #2b241e;
+  --color-ink-soft: #7b7067;
+  --color-line: #eadfd3;
+  --color-line-soft: #f3ebe2;
+  --color-leaf: #5ba37a;
+  --color-leaf-soft: #e3f1e8;
+  --color-berry: #d96b62;
+  --color-berry-soft: #fbe5e2;
+  --color-sky: #8fc3e0;
+
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 1.25rem;
+  --shadow-soft: 0 1px 2px rgba(43, 36, 30, 0.04), 0 8px 24px -12px rgba(43, 36, 30, 0.12);
+  --shadow-lift: 0 2px 4px rgba(43, 36, 30, 0.05), 0 18px 40px -18px rgba(230, 118, 36, 0.35);
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-peach);
+}
+
+:focus-visible {
+  outline: 3px solid color-mix(in oklab, var(--color-orange) 55%, white);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+@layer components {
+  .card {
+    @apply rounded-[var(--radius-card)] border border-line bg-paper shadow-[var(--shadow-soft)];
+  }
+  .eyebrow {
+    @apply text-xs font-bold uppercase tracking-[0.14em] text-orange-deep;
+  }
+  .field {
+    @apply w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-[15px] text-ink placeholder:text-ink-soft/70 outline-none transition focus:border-orange focus:ring-4 focus:ring-orange/15;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-semibold text-ink;
+  }
+  .table-x {
+    @apply w-full text-left text-sm;
+  }
+  .table-x th {
+    @apply border-b border-line px-3 py-2.5 text-xs font-bold uppercase tracking-wider text-ink-soft;
+  }
+  .table-x td {
+    @apply border-b border-line-soft px-3 py-3 align-top;
+  }
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.floaty {
+  animation: floaty 4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .floaty {
+    animation: none;
+  }
+}

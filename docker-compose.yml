@@ -1,0 +1,12 @@
+# Local PostgreSQL for development. Production uses a managed Postgres.
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: hugshire
+      POSTGRES_PASSWORD: hugshire_local_only
+      POSTGRES_DB: hugshire
+    ports: ["5433:5432"]
+    volumes: ["hugshire-pg:/var/lib/postgresql/data"]
+volumes:
+  hugshire-pg:
