@@ -984,7 +984,9 @@ export class WorldGame {
       else {
         const walking = e.state === "walk";
         const frame = walking ? 2 + (Math.floor(t * 7 + e.x * 0.01) % 2) : Math.floor(t * 2 + e.y * 0.01) % 2;
-        b = this.tex.mascot(e.mascot, frame, e.back && walkingNow(e), !!e.side && walkingNow(e));
+        // 4-frame walk cycle at about 8 fps, offset per character so a crowd does not step in sync
+        const wf = walking ? Math.floor(t * 8 + (e.x + e.y) * 0.013) % 4 : -1;
+        b = this.tex.mascot(e.mascot, frame, e.back && walking, !!e.side && walking, wf);
       }
       if (!e.spr) e.spr = this.sprite(b);
       e.spr.texture = b.tex;
@@ -996,8 +998,9 @@ export class WorldGame {
         // one image per pose: a hop while walking and a slow breath while idle
         const ph = t * 9 + e.x * 0.05;
         if (walkingNow(e)) {
-          bob = -Math.abs(Math.sin(ph)) * 3.5;
-          squash = 1 + Math.sin(ph * 2) * 0.03;
+          // real walk frames carry the motion; keep only a hint of bounce
+          bob = -Math.abs(Math.sin(ph)) * (b.walk ? 1 : 3.5);
+          squash = 1 + Math.sin(ph * 2) * (b.walk ? 0.01 : 0.03);
         } else squash = 1 + Math.sin(t * 2.4 + e.y) * 0.015;
       }
       const flip = e.kind === "truck" || !b.art || e.side ? e.facing : 1;

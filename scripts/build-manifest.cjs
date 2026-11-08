@@ -71,13 +71,22 @@ const MAP = {
   "vehicle:truck": ["extras/truck.png", 104],
   "animal:sheep": ["extras/sheep.png", 38],
 };
+// helpers: standing pose + 4-frame walk cycle per direction, all scaled to the same height
+const HEIGHTS = {};
 for (const m of ["cat", "dog", "rabbit", "otter", "panda", "fox", "raccoon", "bird"])
-  for (const pose of ["front", "side", "back"]) MAP[`mascot:${m}:${pose}`] = [`mascots/${m}_${pose}.png`, 48];
+  for (const pose of ["front", "side", "back"]) {
+    MAP[`mascot:${m}:${pose}`] = [`mascots/${m}_${pose}.png`, 0];
+    HEIGHTS[`mascot:${m}:${pose}`] = 60;
+    for (let i = 0; i < 4; i++) {
+      MAP[`mascot:${m}:${pose}:${i}`] = [`mascots/walk/${m}_${pose}_${i}.png`, 0];
+      HEIGHTS[`mascot:${m}:${pose}:${i}`] = 60;
+    }
+  }
 
 const out = {};
 for (const [k, [file, width, ay]] of Object.entries(MAP)) {
   if (!fs.existsSync(path.join(root, file))) continue;
-  out[k] = { file, width, ax: 0.5, ay: ay ?? 0.95 };
+  out[k] = HEIGHTS[k] ? { file, height: HEIGHTS[k], ax: 0.5, ay: ay ?? 0.97 } : { file, width, ax: 0.5, ay: ay ?? 0.95 };
 }
 fs.writeFileSync(path.join(root, "manifest.json"), JSON.stringify(out, null, 2) + "\n");
 console.log(`manifest: ${Object.keys(out).length} sprites (${Object.keys(MAP).length - Object.keys(out).length} still using placeholders)`);

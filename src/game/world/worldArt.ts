@@ -9,8 +9,8 @@ import { drawShapes } from "../art";
 import { CELL, G, TILE_CELLS, TILE_PX, type Decal, type PropKind, type TileData } from "./gen";
 import { mascotShapes, type Mascot } from "./mascots";
 
-export type Baked = { tex: Texture; ax: number; ay: number; scale: number; art?: boolean };
-export type Manifest = Record<string, { file: string; ax?: number; ay?: number; width?: number }>;
+export type Baked = { tex: Texture; ax: number; ay: number; scale: number; art?: boolean; walk?: boolean };
+export type Manifest = Record<string, { file: string; ax?: number; ay?: number; width?: number; height?: number }>;
 export type GroundTextures = Partial<Record<"grass" | "path" | "plaza" | "water" | "asphalt" | "sidewalk" | "soil", Texture>>;
 /** World pixels per repeat of a ground texture; divides TILE_PX so the pattern is seamless across tiles. */
 const GROUND_PERIOD = 320;
@@ -504,9 +504,9 @@ export class WorldTextures {
             this.ground[k.slice(7) as keyof GroundTextures] = tex;
             return;
           }
-          const scale = m.width ? m.width / tex.width : 1;
+          const scale = m.height ? m.height / tex.height : m.width ? m.width / tex.width : 1;
           tex.source.scaleMode = "linear";
-          this.cache.set(k, { tex, ax: m.ax ?? 0.5, ay: m.ay ?? 0.94, scale, art: true });
+          this.cache.set(k, { tex, ax: m.ax ?? 0.5, ay: m.ay ?? 0.94, scale, art: true, walk: /^mascot:\w+:\w+:\d$/.test(k) });
         }),
       );
     } catch {
@@ -530,8 +530,12 @@ export class WorldTextures {
     return this.cache.get(`prop:${k}:${v}`) ?? this.cache.get(`prop:${k}`) ?? this.bake(`prop:${k}:${v}`, () => drawWorldProp(k, v));
   }
   /** Generated art has one image per pose (front / side / back); the engine adds a walking bob. */
-  mascot(m: Mascot, frame: number, back: boolean, side = false) {
+  mascot(m: Mascot, frame: number, back: boolean, side = false, walkFrame = -1) {
     const pose = back ? "back" : side ? "side" : "front";
+    if (walkFrame >= 0) {
+      const w = this.cache.get(`mascot:${m}:${pose}:${walkFrame}`);
+      if (w) return w;
+    }
     const man = this.cache.get(`mascot:${m}:${pose}`) ?? this.cache.get(`mascot:${m}:front`);
     if (man) return man;
     return this.bake(`m:${m}:${frame}:${back ? 1 : 0}`, () => drawShapes(new Graphics(), mascotShapes(m, frame, back)), { x: 32, y: 68 }, 2);

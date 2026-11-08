@@ -343,146 +343,722 @@
   },
   "mascot:cat:front": {
     "file": "mascots/cat_front.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:cat:front:0": {
+    "file": "mascots/walk/cat_front_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:cat:front:1": {
+    "file": "mascots/walk/cat_front_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:cat:front:2": {
+    "file": "mascots/walk/cat_front_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:cat:front:3": {
+    "file": "mascots/walk/cat_front_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:cat:side": {
     "file": "mascots/cat_side.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:cat:side:0": {
+    "file": "mascots/walk/cat_side_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:cat:side:1": {
+    "file": "mascots/walk/cat_side_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:cat:side:2": {
+    "file": "mascots/walk/cat_side_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:cat:side:3": {
+    "file": "mascots/walk/cat_side_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:cat:back": {
     "file": "mascots/cat_back.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:cat:back:0": {
+    "file": "mascots/walk/cat_back_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:cat:back:1": {
+    "file": "mascots/walk/cat_back_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:cat:back:2": {
+    "file": "mascots/walk/cat_back_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:cat:back:3": {
+    "file": "mascots/walk/cat_back_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:dog:front": {
     "file": "mascots/dog_front.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:dog:front:0": {
+    "file": "mascots/walk/dog_front_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:dog:front:1": {
+    "file": "mascots/walk/dog_front_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:dog:front:2": {
+    "file": "mascots/walk/dog_front_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:dog:front:3": {
+    "file": "mascots/walk/dog_front_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:dog:side": {
     "file": "mascots/dog_side.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:dog:side:0": {
+    "file": "mascots/walk/dog_side_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:dog:side:1": {
+    "file": "mascots/walk/dog_side_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:dog:side:2": {
+    "file": "mascots/walk/dog_side_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:dog:side:3": {
+    "file": "mascots/walk/dog_side_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:dog:back": {
     "file": "mascots/dog_back.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:dog:back:0": {
+    "file": "mascots/walk/dog_back_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:dog:back:1": {
+    "file": "mascots/walk/dog_back_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:dog:back:2": {
+    "file": "mascots/walk/dog_back_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:dog:back:3": {
+    "file": "mascots/walk/dog_back_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:rabbit:front": {
     "file": "mascots/rabbit_front.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:rabbit:front:0": {
+    "file": "mascots/walk/rabbit_front_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:rabbit:front:1": {
+    "file": "mascots/walk/rabbit_front_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:rabbit:front:2": {
+    "file": "mascots/walk/rabbit_front_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:rabbit:front:3": {
+    "file": "mascots/walk/rabbit_front_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:rabbit:side": {
     "file": "mascots/rabbit_side.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:rabbit:side:0": {
+    "file": "mascots/walk/rabbit_side_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:rabbit:side:1": {
+    "file": "mascots/walk/rabbit_side_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:rabbit:side:2": {
+    "file": "mascots/walk/rabbit_side_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:rabbit:side:3": {
+    "file": "mascots/walk/rabbit_side_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:rabbit:back": {
     "file": "mascots/rabbit_back.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:rabbit:back:0": {
+    "file": "mascots/walk/rabbit_back_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:rabbit:back:1": {
+    "file": "mascots/walk/rabbit_back_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:rabbit:back:2": {
+    "file": "mascots/walk/rabbit_back_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:rabbit:back:3": {
+    "file": "mascots/walk/rabbit_back_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:otter:front": {
     "file": "mascots/otter_front.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:otter:front:0": {
+    "file": "mascots/walk/otter_front_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:otter:front:1": {
+    "file": "mascots/walk/otter_front_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:otter:front:2": {
+    "file": "mascots/walk/otter_front_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:otter:front:3": {
+    "file": "mascots/walk/otter_front_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:otter:side": {
     "file": "mascots/otter_side.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:otter:side:0": {
+    "file": "mascots/walk/otter_side_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:otter:side:1": {
+    "file": "mascots/walk/otter_side_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:otter:side:2": {
+    "file": "mascots/walk/otter_side_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:otter:side:3": {
+    "file": "mascots/walk/otter_side_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:otter:back": {
     "file": "mascots/otter_back.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:otter:back:0": {
+    "file": "mascots/walk/otter_back_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:otter:back:1": {
+    "file": "mascots/walk/otter_back_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:otter:back:2": {
+    "file": "mascots/walk/otter_back_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:otter:back:3": {
+    "file": "mascots/walk/otter_back_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:panda:front": {
     "file": "mascots/panda_front.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:panda:front:0": {
+    "file": "mascots/walk/panda_front_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:panda:front:1": {
+    "file": "mascots/walk/panda_front_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:panda:front:2": {
+    "file": "mascots/walk/panda_front_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:panda:front:3": {
+    "file": "mascots/walk/panda_front_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:panda:side": {
     "file": "mascots/panda_side.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:panda:side:0": {
+    "file": "mascots/walk/panda_side_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:panda:side:1": {
+    "file": "mascots/walk/panda_side_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:panda:side:2": {
+    "file": "mascots/walk/panda_side_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:panda:side:3": {
+    "file": "mascots/walk/panda_side_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:panda:back": {
     "file": "mascots/panda_back.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:panda:back:0": {
+    "file": "mascots/walk/panda_back_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:panda:back:1": {
+    "file": "mascots/walk/panda_back_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:panda:back:2": {
+    "file": "mascots/walk/panda_back_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:panda:back:3": {
+    "file": "mascots/walk/panda_back_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:fox:front": {
     "file": "mascots/fox_front.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:fox:front:0": {
+    "file": "mascots/walk/fox_front_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:fox:front:1": {
+    "file": "mascots/walk/fox_front_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:fox:front:2": {
+    "file": "mascots/walk/fox_front_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:fox:front:3": {
+    "file": "mascots/walk/fox_front_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:fox:side": {
     "file": "mascots/fox_side.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:fox:side:0": {
+    "file": "mascots/walk/fox_side_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:fox:side:1": {
+    "file": "mascots/walk/fox_side_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:fox:side:2": {
+    "file": "mascots/walk/fox_side_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:fox:side:3": {
+    "file": "mascots/walk/fox_side_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:fox:back": {
     "file": "mascots/fox_back.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:fox:back:0": {
+    "file": "mascots/walk/fox_back_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:fox:back:1": {
+    "file": "mascots/walk/fox_back_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:fox:back:2": {
+    "file": "mascots/walk/fox_back_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:fox:back:3": {
+    "file": "mascots/walk/fox_back_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:raccoon:front": {
     "file": "mascots/raccoon_front.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:raccoon:front:0": {
+    "file": "mascots/walk/raccoon_front_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:raccoon:front:1": {
+    "file": "mascots/walk/raccoon_front_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:raccoon:front:2": {
+    "file": "mascots/walk/raccoon_front_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:raccoon:front:3": {
+    "file": "mascots/walk/raccoon_front_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:raccoon:side": {
     "file": "mascots/raccoon_side.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:raccoon:side:0": {
+    "file": "mascots/walk/raccoon_side_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:raccoon:side:1": {
+    "file": "mascots/walk/raccoon_side_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:raccoon:side:2": {
+    "file": "mascots/walk/raccoon_side_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:raccoon:side:3": {
+    "file": "mascots/walk/raccoon_side_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:raccoon:back": {
     "file": "mascots/raccoon_back.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:raccoon:back:0": {
+    "file": "mascots/walk/raccoon_back_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:raccoon:back:1": {
+    "file": "mascots/walk/raccoon_back_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:raccoon:back:2": {
+    "file": "mascots/walk/raccoon_back_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:raccoon:back:3": {
+    "file": "mascots/walk/raccoon_back_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:bird:front": {
     "file": "mascots/bird_front.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:bird:front:0": {
+    "file": "mascots/walk/bird_front_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:bird:front:1": {
+    "file": "mascots/walk/bird_front_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:bird:front:2": {
+    "file": "mascots/walk/bird_front_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:bird:front:3": {
+    "file": "mascots/walk/bird_front_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:bird:side": {
     "file": "mascots/bird_side.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:bird:side:0": {
+    "file": "mascots/walk/bird_side_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:bird:side:1": {
+    "file": "mascots/walk/bird_side_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:bird:side:2": {
+    "file": "mascots/walk/bird_side_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:bird:side:3": {
+    "file": "mascots/walk/bird_side_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   },
   "mascot:bird:back": {
     "file": "mascots/bird_back.png",
-    "width": 48,
+    "height": 60,
     "ax": 0.5,
-    "ay": 0.95
+    "ay": 0.97
+  },
+  "mascot:bird:back:0": {
+    "file": "mascots/walk/bird_back_0.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:bird:back:1": {
+    "file": "mascots/walk/bird_back_1.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:bird:back:2": {
+    "file": "mascots/walk/bird_back_2.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
+  },
+  "mascot:bird:back:3": {
+    "file": "mascots/walk/bird_back_3.png",
+    "height": 60,
+    "ax": 0.5,
+    "ay": 0.97
   }
 }
