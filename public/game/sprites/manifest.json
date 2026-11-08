@@ -1,0 +1,464 @@
+{
+  "prop:townHall": {
+    "file": "buildings/townHall.png",
+    "width": 290,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:barn": {
+    "file": "buildings/barn.png",
+    "width": 210,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:greenhouse": {
+    "file": "buildings/greenhouse.png",
+    "width": 205,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:windmill": {
+    "file": "buildings/windmill.png",
+    "width": 160,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:clinic": {
+    "file": "buildings/clinic.png",
+    "width": 205,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:school": {
+    "file": "buildings/school.png",
+    "width": 250,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:bookshop": {
+    "file": "buildings/bookshop.png",
+    "width": 150,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:studio": {
+    "file": "buildings/studio.png",
+    "width": 205,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:tent": {
+    "file": "buildings/tent.png",
+    "width": 205,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:lighthouse": {
+    "file": "buildings/lighthouse.png",
+    "width": 120,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:gazebo": {
+    "file": "buildings/gazebo.png",
+    "width": 150,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:cottage": {
+    "file": "buildings/cottage.png",
+    "width": 175,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:house:0": {
+    "file": "houses/house0.png",
+    "width": 108,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:house:1": {
+    "file": "houses/house1.png",
+    "width": 108,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:house:2": {
+    "file": "houses/house2.png",
+    "width": 108,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:house:3": {
+    "file": "houses/house3.png",
+    "width": 108,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:kennel": {
+    "file": "houses/kennel.png",
+    "width": 62,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:ruin": {
+    "file": "houses/ruin.png",
+    "width": 150,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:tree:0": {
+    "file": "props/tree.png",
+    "width": 78,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:tree:1": {
+    "file": "props/tree.png",
+    "width": 70,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:tree:2": {
+    "file": "props/tree.png",
+    "width": 84,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:tree:3": {
+    "file": "props/autumn.png",
+    "width": 78,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:pine": {
+    "file": "props/pine.png",
+    "width": 60,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:blossom": {
+    "file": "props/blossom.png",
+    "width": 80,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:bush:0": {
+    "file": "props/bush.png",
+    "width": 46,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:bush:1": {
+    "file": "props/bushFlower.png",
+    "width": 50,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:bush:2": {
+    "file": "props/bush.png",
+    "width": 40,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:bush:3": {
+    "file": "props/bushFlower.png",
+    "width": 46,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:rockBig": {
+    "file": "props/rockBig.png",
+    "width": 72,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:rock": {
+    "file": "props/rock.png",
+    "width": 44,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:stump": {
+    "file": "props/stump.png",
+    "width": 44,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:flowers": {
+    "file": "props/flowers.png",
+    "width": 40,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:mushroom": {
+    "file": "props/mushroom.png",
+    "width": 30,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:reeds": {
+    "file": "props/reeds.png",
+    "width": 38,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:fountain": {
+    "file": "props/fountain.png",
+    "width": 150,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:lamp": {
+    "file": "props/lamp.png",
+    "width": 22,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:bench": {
+    "file": "props/bench.png",
+    "width": 62,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:fenceH": {
+    "file": "props/fence.png",
+    "width": 40,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:hay": {
+    "file": "props/hay.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:scarecrow": {
+    "file": "props/scarecrow.png",
+    "width": 46,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:easel": {
+    "file": "props/easel.png",
+    "width": 42,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:boxes": {
+    "file": "props/boxes.png",
+    "width": 44,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:well": {
+    "file": "props/well.png",
+    "width": 60,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:stall": {
+    "file": "props/stall.png",
+    "width": 78,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:signNew": {
+    "file": "props/signpost.png",
+    "width": 54,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:signCause": {
+    "file": "props/signpost.png",
+    "width": 50,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "prop:foundation": {
+    "file": "props/foundation.png",
+    "width": 160,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "ground:grass": {
+    "file": "ground/grass.png",
+    "width": 0,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "ground:path": {
+    "file": "ground/path.png",
+    "width": 0,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "ground:plaza": {
+    "file": "ground/plaza.png",
+    "width": 0,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "ground:water": {
+    "file": "ground/water.png",
+    "width": 0,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "vehicle:truck": {
+    "file": "extras/truck.png",
+    "width": 104,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "animal:sheep": {
+    "file": "extras/sheep.png",
+    "width": 38,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:cat:front": {
+    "file": "mascots/cat_front.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:cat:side": {
+    "file": "mascots/cat_side.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:cat:back": {
+    "file": "mascots/cat_back.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:dog:front": {
+    "file": "mascots/dog_front.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:dog:side": {
+    "file": "mascots/dog_side.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:dog:back": {
+    "file": "mascots/dog_back.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:rabbit:front": {
+    "file": "mascots/rabbit_front.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:rabbit:side": {
+    "file": "mascots/rabbit_side.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:rabbit:back": {
+    "file": "mascots/rabbit_back.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:otter:front": {
+    "file": "mascots/otter_front.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:otter:side": {
+    "file": "mascots/otter_side.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:otter:back": {
+    "file": "mascots/otter_back.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:panda:front": {
+    "file": "mascots/panda_front.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:panda:side": {
+    "file": "mascots/panda_side.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:panda:back": {
+    "file": "mascots/panda_back.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:fox:front": {
+    "file": "mascots/fox_front.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:fox:side": {
+    "file": "mascots/fox_side.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:fox:back": {
+    "file": "mascots/fox_back.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:raccoon:front": {
+    "file": "mascots/raccoon_front.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:raccoon:side": {
+    "file": "mascots/raccoon_side.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:raccoon:back": {
+    "file": "mascots/raccoon_back.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:bird:front": {
+    "file": "mascots/bird_front.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:bird:side": {
+    "file": "mascots/bird_side.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "mascot:bird:back": {
+    "file": "mascots/bird_back.png",
+    "width": 48,
+    "ax": 0.5,
+    "ay": 0.95
+  }
+}
