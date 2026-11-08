@@ -11,7 +11,7 @@ import { mascotShapes, type Mascot } from "./mascots";
 
 export type Baked = { tex: Texture; ax: number; ay: number; scale: number; art?: boolean };
 export type Manifest = Record<string, { file: string; ax?: number; ay?: number; width?: number }>;
-export type GroundTextures = Partial<Record<"grass" | "path" | "plaza" | "water", Texture>>;
+export type GroundTextures = Partial<Record<"grass" | "path" | "plaza" | "water" | "asphalt" | "sidewalk" | "soil", Texture>>;
 /** World pixels per repeat of a ground texture; divides TILE_PX so the pattern is seamless across tiles. */
 const GROUND_PERIOD = 320;
 
@@ -343,51 +343,111 @@ export function drawWorldProp(k: PropKind, v: number): G2 {
 export function drawTileGround(t: TileData, detail = true, gt: GroundTextures = {}): Graphics {
   const g = new Graphics();
   const ox = t.tx * TILE_PX, oy = t.ty * TILE_PX;
-  const civ = !!t.cause || t.kind === "expansion";
-  const base = t.kind === "forest" ? "#B5D9A0" : t.kind === "hills" ? "#C7DCA6" : civ ? "#C9E5B2" : "#BFE0A6";
-  const texFill = (tex: Texture | undefined) =>
-    tex ? { texture: tex, matrix: new Matrix().scale(GROUND_PERIOD / tex.width, GROUND_PERIOD / tex.height), textureSpace: "global" as const } : null;
-  const grass = texFill(gt.grass);
-  g.rect(0, 0, TILE_PX, TILE_PX).fill(grass ?? base);
-  if (grass && t.kind === "forest") g.rect(0, 0, TILE_PX, TILE_PX).fill({ color: "#5E9F78", alpha: 0.12 });
-  if (detail && !grass) {
-    // soft grass texture, deterministic
-    let s = (t.tx * 73856093) ^ (t.ty * 19349663);
-    const rnd = () => ((s = (s * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
-    for (let i = 0; i < 70; i++) g.circle(rnd() * TILE_PX, rnd() * TILE_PX, 6 + rnd() * 18).fill({ color: "#FFFFFF", alpha: 0.05 });
-    for (let i = 0; i < 90; i++) {
-      const x = rnd() * TILE_PX, y = rnd() * TILE_PX;
-      g.moveTo(x, y).lineTo(x + 2, y - 5).moveTo(x + 3, y).lineTo(x + 4, y - 4).stroke({ color: "#8FC27E", width: 1.4, alpha: 0.7 });
+  // repeat periods must divide TILE_PX (640) so patterns continue across tiles
+  const texFill = (tex: Texture | undefined, period = GROUND_PERIOD) =>
+    tex ? { texture: tex, matrix: new Matrix().scale(period / tex.width, period / tex.height), textureSpace: "global" as const } : null;
+  const at = (x: number, y: number) => (x < 0 || y < 0 || x >= TILE_CELLS || y >= TILE_CELLS ? -1 : t.ground[y * TILE_CELLS + x]);
+  const cells = (pred: (c: number) => boolean) => {
+    const out: [number, number][] = [];
+    for (let y = 0; y < TILE_CELLS; y++) for (let x = 0; x < TILE_CELLS; x++) if (pred(at(x, y))) out.push([x, y]);
+    return out;
+  };
+
+  // 1. lawn
+  g.rect(0, 0, TILE_PX, TILE_PX).fill(texFill(gt.grass) ?? "#B7CC98");
+  if (t.kind === "forest") g.rect(0, 0, TILE_PX, TILE_PX).fill({ color: "#56805F", alpha: 0.1 });
+  if (t.kind === "hills") g.rect(0, 0, TILE_PX, TILE_PX).fill({ color: "#E9DDB8", alpha: 0.1 });
+
+  // 2. soft rounded areas: shore + water, built from overlapping discs and bridges between cell centres
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // Each cell gets a stable random wobble so shorelines look natural rather than machined.
+  const wob = (x: number, y: number) => {
+    const h = Math.sin((x + t.tx * TILE_CELLS) * 12.9898 + (y + t.ty * TILE_CELLS) * 78.233) * 43758.5453;
+    return (h - Math.floor(h) - 0.5) * 9;
+  };
+  const blob = (list: [number, number][], r: number, fill: any) => {
+    const set = new Set(list.map(([x, y]) => y * TILE_CELLS + x));
+    const has = (x: number, y: number) => set.has(y * TILE_CELLS + x);
+    const rb = r - 4.5; // bridges are thinner than the discs, so the edge follows the wobbly discs
+    for (const [x, y] of list) {
+      const cx = (x + 0.5) * CELL, cy = (y + 0.5) * CELL;
+      const edge = !(has(x + 1, y) && has(x - 1, y) && has(x, y + 1) && has(x, y - 1));
+      g.circle(cx, cy, r + (edge ? wob(x, y) : 4)).fill(fill);
+      if (has(x + 1, y)) g.rect(cx, cy - rb, CELL, rb * 2).fill(fill);
+      if (has(x, y + 1)) g.rect(cx - rb, cy, rb * 2, CELL).fill(fill);
+      if (has(x + 1, y) && has(x, y + 1) && has(x + 1, y + 1)) g.rect(cx, cy, CELL, CELL).fill(fill);
+    }
+  };
+  const water = cells((c) => c === G.WATER);
+  const shore = cells((c) => c === G.WATER || c === G.SAND);
+  if (shore.length) {
+    blob(shore, 23, "#B9AE8E"); // outer bank line
+    blob(shore, 20.5, "#E6DCBE"); // sandy bank
+    blob(water, 16.5, "#86B5BA"); // wet edge
+    blob(water, 14.5, texFill(gt.water) ?? "#9CC8CB");
+    if (detail)
+      for (const [x, y] of water)
+        if ((x * 7 + y * 3) % 6 === 0) g.moveTo(x * CELL + 6, y * CELL + 16).quadraticCurveTo(x * CELL + 13, y * CELL + 11, x * CELL + 20, y * CELL + 16).stroke({ color: "#FFFFFF", width: 1.6, alpha: 0.45 });
+  }
+
+  // 3. plaza cobbles with a stone kerb
+  const plaza = cells((c) => c === G.PLAZA);
+  for (const [x, y] of plaza) g.rect(x * CELL, y * CELL, CELL, CELL).fill(texFill(gt.plaza) ?? "#EADFC9");
+  for (const [x, y] of plaza) {
+    const k = { color: "#C9B795", alpha: 1 };
+    if (at(x, y - 1) !== G.PLAZA) g.rect(x * CELL, y * CELL, CELL, 3).fill(k);
+    if (at(x, y + 1) !== G.PLAZA) g.rect(x * CELL, y * CELL + CELL - 3, CELL, 3).fill(k);
+    if (at(x - 1, y) !== G.PLAZA) g.rect(x * CELL, y * CELL, 3, CELL).fill(k);
+    if (at(x + 1, y) !== G.PLAZA) g.rect(x * CELL + CELL - 3, y * CELL, 3, CELL).fill(k);
+  }
+
+  // 4. farm beds: rounded runs of tilled soil with a wooden edge
+  for (let y = 0; y < TILE_CELLS; y++) {
+    let x = 0;
+    while (x < TILE_CELLS) {
+      if (at(x, y) !== G.SOIL) { x++; continue; }
+      let x2 = x;
+      while (at(x2 + 1, y) === G.SOIL) x2++;
+      const rx = x * CELL + 2, ry = y * CELL + 3, rw = (x2 - x + 1) * CELL - 4, rh = CELL - 6;
+      g.roundRect(rx - 2, ry - 2, rw + 4, rh + 4, 10).fill("#9A7552");
+      g.roundRect(rx, ry, rw, rh, 8).fill(texFill(gt.soil, 160) ?? "#8E6142");
+      if (!gt.soil) for (let fy = ry + 6; fy < ry + rh - 2; fy += 7) g.rect(rx + 6, fy, rw - 12, 1.5).fill({ color: "#6F4A30", alpha: 0.6 });
+      x = x2 + 1;
     }
   }
-  const at = (x: number, y: number) => t.ground[y * TILE_CELLS + x];
-  const C: Record<number, string> = { [G.ROAD]: "#EBD7B5", [G.WATER]: "#8ECFE6", [G.SOIL]: "#B9875A", [G.PLAZA]: "#EFE2CC", [G.SAND]: "#F3E3C3", [G.DIRT]: "#DCCBA6", [G.PLANK]: "#C69A6A" };
-  for (let y = 0; y < TILE_CELLS; y++)
-    for (let x = 0; x < TILE_CELLS; x++) {
-      const c = at(x, y);
-      if (c === G.GRASS) continue;
-      const tf = c === G.WATER ? texFill(gt.water) : c === G.PLAZA ? texFill(gt.plaza) : c === G.ROAD || c === G.DIRT || c === G.SAND || c === G.SOIL ? texFill(gt.path) : null;
-      // paved cells are square so neighbours join without grass showing through the corners
-      const r = c === G.WATER ? 10 : tf || c === G.PLAZA || c === G.ROAD ? 0 : 6;
-      const pad = c === G.WATER ? 2 : 0;
-      g.roundRect(x * CELL - pad, y * CELL - pad, CELL + pad * 2, CELL + pad * 2, r).fill(tf ?? C[c]);
-      if (tf && c === G.SAND) g.rect(x * CELL, y * CELL, CELL, CELL).fill({ color: "#FFF3D6", alpha: 0.35 });
-      if (tf && c === G.SOIL) g.rect(x * CELL, y * CELL, CELL, CELL).fill({ color: "#6B3E1E", alpha: 0.45 });
-      if (tf && c === G.DIRT) g.rect(x * CELL, y * CELL, CELL, CELL).fill({ color: "#8A6448", alpha: 0.08 });
-      if (c === G.PLANK) g.rect(x * CELL, y * CELL + 15, CELL, 2).fill("#9C7148");
-      if (c === G.PLAZA && detail && !gt.plaza && (x + y) % 2 === 0) g.roundRect(x * CELL + 3, y * CELL + 3, CELL - 6, CELL - 6, 3).fill({ color: "#FFFFFF", alpha: 0.25 });
-    }
+
+  // 5. empty plots: a slightly lighter lawn (outline comes from the dash decal)
+  for (const [x, y] of cells((c) => c === G.DIRT)) g.rect(x * CELL, y * CELL, CELL, CELL).fill({ color: "#FFFBEA", alpha: 0.16 });
+
+  // 6. streets: asphalt, kerbs, sidewalks both sides, centre dashes, zebra crossings
+  const E = t.edges;
+  const asphalt = texFill(gt.asphalt) ?? "#9A8D82";
+  for (const [x, y] of cells((c) => c === G.ROAD)) g.rect(x * CELL, y * CELL, CELL, CELL).fill(asphalt);
+  const SW = 15, KERB = "#BDAF97";
+  const walk = texFill(gt.sidewalk, 128) ?? "#EFE4CF";
+  const R = 2 * CELL; // road band width
+  const x0 = E.left ? R : 0, y0 = E.top ? R : 0;
+  if (E.top) { g.rect(x0, R, TILE_PX - x0, SW).fill(walk); g.rect(x0, R, TILE_PX - x0, 2.5).fill(KERB); }
+  if (E.left) { g.rect(R, y0, SW, TILE_PX - y0).fill(walk); g.rect(R, y0, 2.5, TILE_PX - y0).fill(KERB); }
+  if (E.bottom) { g.rect(x0, TILE_PX - SW, TILE_PX - x0, SW).fill(walk); g.rect(x0, TILE_PX - 2.5, TILE_PX - x0, 2.5).fill(KERB); }
+  if (E.right) { g.rect(TILE_PX - SW, y0, SW, TILE_PX - y0).fill(walk); g.rect(TILE_PX - 2.5, y0, 2.5, TILE_PX - y0).fill(KERB); }
   if (detail) {
-    // road edge stones and centre dashes
-    for (let y = 0; y < TILE_CELLS; y++)
-      for (let x = 0; x < TILE_CELLS; x++)
-        if (at(x, y) === G.ROAD && ((x === 0 && y > 1) || (y === 0 && x > 1)) && (x + y) % 3 === 0)
-          g.roundRect(x * CELL + (y === 0 ? 8 : 26), y * CELL + (y === 0 ? 26 : 8), y === 0 ? 14 : 4, y === 0 ? 4 : 14, 2).fill({ color: "#FFFFFF", alpha: 0.55 });
-    // water shine
-    for (let y = 0; y < TILE_CELLS; y++)
-      for (let x = 0; x < TILE_CELLS; x++)
-        if (at(x, y) === G.WATER && (x * 7 + y * 3) % 5 === 0) g.moveTo(x * CELL + 6, y * CELL + 14).quadraticCurveTo(x * CELL + 12, y * CELL + 10, x * CELL + 18, y * CELL + 14).stroke({ color: "#FFFFFF", width: 2, alpha: 0.5 });
+    const dash = { color: "#F4EBD6", alpha: 0.9 };
+    if (at(5, 0) === G.ROAD) for (let x = R + 18; x < TILE_PX - 10; x += 44) g.roundRect(x, CELL - 1.5, 22, 3, 1.5).fill(dash);
+    if (at(0, 5) === G.ROAD) for (let y = R + 18; y < TILE_PX - 10; y += 44) g.roundRect(CELL - 1.5, y, 3, 22, 1.5).fill(dash);
+    if (t.cause) {
+      const zebra = { color: "#F7F0E0", alpha: 0.95 };
+      if (at(5, 0) === G.ROAD) for (let i = 0; i < 6; i++) g.rect(R + 10, 5 + i * 9.5, 30, 5.5).fill(zebra);
+      if (at(0, 5) === G.ROAD) for (let i = 0; i < 6; i++) g.rect(5 + i * 9.5, R + 10, 5.5, 30).fill(zebra);
+    }
   }
+
+  // 7. docks
+  for (const [x, y] of cells((c) => c === G.PLANK)) {
+    g.rect(x * CELL - 1, y * CELL, CELL + 2, CELL).fill("#B58658");
+    for (let i = 0; i < 4; i++) g.rect(x * CELL, y * CELL + i * 8 + 7, CELL, 1.5).fill("#8A6240");
+  }
+
   for (const d of t.decals) drawDecal(g, d, d.x - ox, d.y - oy);
   return g;
 }

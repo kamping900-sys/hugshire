@@ -49,6 +49,7 @@ const MAP = {
   "prop:lamp": ["props/lamp.png", 22],
   "prop:bench": ["props/bench.png", 62],
   "prop:fenceH": ["props/fence.png", 40],
+  "prop:fenceV": ["props/fence.png", 36],
   "prop:hay": ["props/hay.png", 48],
   "prop:scarecrow": ["props/scarecrow.png", 46],
   "prop:easel": ["props/easel.png", 42],
@@ -63,6 +64,9 @@ const MAP = {
   "ground:path": ["ground/path.png", 0],
   "ground:plaza": ["ground/plaza.png", 0],
   "ground:water": ["ground/water.png", 0],
+  "ground:asphalt": ["ground/asphalt.png", 0],
+  "ground:sidewalk": ["ground/sidewalk.png", 0],
+  "ground:soil": ["ground/soil.png", 0],
   // vehicles & animals
   "vehicle:truck": ["extras/truck.png", 104],
   "animal:sheep": ["extras/sheep.png", 38],

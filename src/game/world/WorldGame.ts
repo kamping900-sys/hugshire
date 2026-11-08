@@ -12,7 +12,7 @@
  *  - Pathfinding is bounded A* with a per-frame budget. The HUD is updated at 4 Hz, not per frame.
  *  - The ticker stops while the tab is hidden.
  */
-import { Application, Container, Graphics, Rectangle, Sprite, Text, Texture, type FederatedPointerEvent } from "pixi.js";
+import { Application, ColorMatrixFilter, Container, Graphics, Rectangle, Sprite, Text, Texture, type FederatedPointerEvent } from "pixi.js";
 import { CELL, TILE_CELLS, TILE_PX, World, hash2, key, rng, type WorldCause } from "./gen";
 import { MASCOTS, type Mascot } from "./mascots";
 import { findPath, simplify, type Cell } from "./path";
@@ -93,6 +93,7 @@ export class WorldGame {
   private fx = new Container();
   private labelLayer = new Container();
   private tint = new Graphics();
+  private vignette: Sprite | null = null;
   private tiles = new Map<string, TileView>();
   private groundCache = new Map<string, Texture>();
   private thumbs = new Map<string, Sprite>();
@@ -153,6 +154,7 @@ export class WorldGame {
     this.actors.sortableChildren = true;
     this.cam.addChild(this.thumbLayer, this.groundLayer, this.actors, this.fx, this.labelLayer);
     this.app.stage.addChild(this.cam, this.tint);
+    this.cozyGrade();
 
     for (const w of this.workers) this.spawnMine(w);
     const p = this.player();
@@ -436,8 +438,9 @@ export class WorldGame {
     this.pathBudget--;
     const t = this.world.tile(e.homeTx, e.homeTy);
     const r = Math.random;
-    const goHall = t.hall && r() < 0.3;
-    const p = goHall ? t.hall! : this.randomSpot(e.homeTx, e.homeTy, r);
+    // most helpers potter around their town; a few visit the hall, spreading out in front of it
+    const goHall = t.hall && r() < 0.12;
+    const p = goHall ? { x: t.hall!.x + (r() - 0.5) * 120, y: t.hall!.y + 20 + r() * 50 } : this.randomSpot(e.homeTx, e.homeTy, r);
     this.routeTo(e, p.x, p.y, 900);
     if (e.state === "idle") e.timer = 2;
   }
@@ -1046,6 +1049,32 @@ export class WorldGame {
     }
   }
 
+  /**
+   * Cozy look: a gentle colour grade (slightly softer saturation, warm lift) and a soft vignette.
+   * One filter pass over the world plus one screen-space sprite; skipped on low-power devices.
+   */
+  private cozyGrade() {
+    if (!this.lowPower) {
+      const cm = new ColorMatrixFilter();
+      cm.saturate(-0.1, false);
+      // warm lift: nudge reds up and blues down a touch
+      const m = cm.matrix;
+      m[0] *= 1.03; m[12] *= 0.96; m[4] += 0.01; m[14] -= 0.005;
+      cm.matrix = m;
+      this.cam.filters = [cm];
+    }
+    const c = document.createElement("canvas");
+    c.width = c.height = 256;
+    const x = c.getContext("2d")!;
+    const grd = x.createRadialGradient(128, 128, 70, 128, 128, 182);
+    grd.addColorStop(0, "rgba(74,52,36,0)");
+    grd.addColorStop(1, "rgba(74,52,36,0.28)");
+    x.fillStyle = grd;
+    x.fillRect(0, 0, 256, 256);
+    this.vignette = new Sprite(Texture.from(c));
+    this.app.stage.addChild(this.vignette);
+  }
+
   /** Gentle day/night light: a single translucent overlay, no per-sprite cost. */
   private updateTint() {
     const m = this.clock;
@@ -1055,6 +1084,10 @@ export class WorldGame {
     else if (m > 1080) {
       color = m < 1170 ? 0xf08a3e : 0x1d2a5a;
       a = m < 1170 ? ((m - 1080) / 90) * 0.12 : 0.12 + ((m - 1170) / 90) * 0.2;
+    }
+    if (this.vignette) {
+      this.vignette.width = this.app.screen.width;
+      this.vignette.height = this.app.screen.height;
     }
     this.tint.clear();
     if (a > 0.005) this.tint.rect(0, 0, this.app.screen.width, this.app.screen.height).fill({ color, alpha: a });

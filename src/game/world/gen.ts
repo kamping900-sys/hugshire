@@ -56,6 +56,8 @@ export type TileData = {
   hall: { x: number; y: number } | null;
   /** Paddock bounds for wandering sheep (world px). */
   paddock: { x0: number; y0: number; x1: number; y1: number } | null;
+  /** Streets touching this tile: top/left run inside it; bottom/right run inside the next tile. */
+  edges: { top: boolean; left: boolean; bottom: boolean; right: boolean };
 };
 
 // ───────────────────────────── hashing ─────────────────────────────
@@ -260,13 +262,27 @@ function roads(b: Builder, world: World) {
   if (left) b.rect(0, 0, 2, TILE_CELLS, G.ROAD);
   // corner piece so roads always join
   if (!top && !left && (world.isCivilized(tx - 1, ty - 1) || (world.isCivilized(tx, ty - 1) && world.isCivilized(tx - 1, ty)))) b.rect(0, 0, 2, 2, G.ROAD);
+  return { top, left, bottom: civ || world.isCivilized(tx, ty + 1), right: civ || world.isCivilized(tx + 1, ty) };
+}
+
+/** Street lamps and planters along the sidewalks of town tiles. */
+function streetFurniture(b: Builder, e: { top: boolean; left: boolean }) {
+  if (e.top)
+    for (const x of [5, 11, 17])
+      if (b.free(x, 2) && b.free(x + 1, 2)) b.props.push({ k: "lamp", x: b.ox + x * CELL + 6, y: b.oy + 2 * CELL + 20, v: 0, s: 1 });
+  if (e.left)
+    for (const y of [6, 12, 18])
+      if (b.free(2, y)) b.props.push({ k: "lamp", x: b.ox + 2 * CELL + 10, y: b.oy + y * CELL + 6, v: 0, s: 1 });
+  if (e.top)
+    for (const x of [8, 14])
+      if (b.free(x, 2)) b.props.push({ k: "bush", x: b.ox + x * CELL + 16, y: b.oy + 2 * CELL + 22, v: 1, s: 0.75 });
 }
 
 export function generateTile(world: World, tx: number, ty: number): TileData {
   const cause = world.causeAt(tx, ty);
   const kind = world.kindAt(tx, ty);
   const b = new Builder(tx, ty, rng(Math.floor(hash2(tx, ty, 99) * 2 ** 31)));
-  roads(b, world);
+  const edges = roads(b, world);
   const stage = cause?.stage ?? 0;
 
   switch (kind) {
@@ -292,8 +308,9 @@ export function generateTile(world: World, tx: number, ty: number): TileData {
   // A little life on every civilised tile
   if (cause && stage >= 2) b.scatter(["flowers", "bush"], 4 + stage * 2, false);
 
+  if (cause) streetFurniture(b, edges);
   b.props.sort((p, q) => p.y - q.y);
-  return { tx, ty, kind, cause, ground: b.ground, blocked: b.blocked, props: b.props, decals: b.decals, hall: b.hall, paddock: b.paddock };
+  return { tx, ty, kind, cause, ground: b.ground, blocked: b.blocked, props: b.props, decals: b.decals, hall: b.hall, paddock: b.paddock, edges };
 }
 
 // ───────────────────────────── district layouts ─────────────────────────────
@@ -399,10 +416,11 @@ function arts(b: Builder, s: number) {
 
 function community(b: Builder, s: number) {
   // harbour: water along the bottom with a dock
-  b.rect(2, 15, 18, 5, G.WATER);
-  b.rect(2, 14, 18, 1, G.SAND);
-  b.block(2, 15, 18, 5);
-  for (let y = 14; y <= 18; y++) {
+  // harbour: a rounded bay inside the tile, with a dock
+  b.rect(3, 15, 16, 4, G.WATER);
+  b.rect(4, 14, 14, 1, G.SAND);
+  b.block(3, 15, 16, 4);
+  for (let y = 14; y <= 17; y++) {
     b.setG(9, y, G.PLANK);
     b.setG(10, y, G.PLANK);
     b.blocked[y * TILE_CELLS + 9] = 0;
@@ -436,7 +454,7 @@ function homes(b: Builder, s: number) {
 }
 
 function expansion(b: Builder) {
-  b.rect(3, 3, 15, 15, G.DIRT);
+  b.rect(3, 3, 15, 15, G.DIRT); // drawn as a soft, lighter lawn with a dashed plot outline
   b.decal("dash", 3, 3, 0);
   b.put("signNew", 10, 9, 1, 1, true);
   b.scatter(["rock", "stump", "bush"], 8, false, { x0: 3, y0: 3, x1: 17, y1: 17 });

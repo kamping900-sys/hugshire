@@ -227,6 +227,12 @@
     "ax": 0.5,
     "ay": 0.95
   },
+  "prop:fenceV": {
+    "file": "props/fence.png",
+    "width": 36,
+    "ax": 0.5,
+    "ay": 0.95
+  },
   "prop:hay": {
     "file": "props/hay.png",
     "width": 48,
@@ -301,6 +307,24 @@
   },
   "ground:water": {
     "file": "ground/water.png",
+    "width": 0,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "ground:asphalt": {
+    "file": "ground/asphalt.png",
+    "width": 0,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "ground:sidewalk": {
+    "file": "ground/sidewalk.png",
+    "width": 0,
+    "ax": 0.5,
+    "ay": 0.95
+  },
+  "ground:soil": {
+    "file": "ground/soil.png",
     "width": 0,
     "ax": 0.5,
     "ay": 0.95
