@@ -183,12 +183,12 @@ export class VaultLending implements LendingProvider {
     const vault = this.env.NEAR_VAULT_CONTRACT!;
     const [supplied, idle, totals, apr] = await Promise.all([
       readRheaSupplied(this.rpc, this.env.RHEA_LENDING_CONTRACT, vault, this.env.NEAR_USDC_CONTRACT),
-      this.rpc.view<string>(this.env.NEAR_USDC_CONTRACT, "ft_balance_of", { account_id: vault }),
-      this.rpc.view<{ total_principal: string }>(vault, "get_totals"),
+      Promise.resolve("0"),
+      this.rpc.view<{ total_principal: string; idle: string }>(vault, "get_totals"),
       this.supplyApr(),
     ]);
     return {
-      assetsMicro: supplied + BigInt(idle),
+      assetsMicro: supplied + BigInt(totals.idle) + BigInt(idle),
       onchainPrincipalMicro: BigInt(totals.total_principal),
       supplyAprWad: apr,
       source: "rhea_onchain" as const,

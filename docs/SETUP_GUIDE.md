@@ -158,33 +158,35 @@ Notes verified on 2026-11-07:
 
 ## 5. NEAR: accounts, Vault deploy, RHEA registration
 
+> The Vault is **v2** (share-based, user-authorised donations). Design, invariants and the audit of
+> v1 are in [VAULT_V2.md](VAULT_V2.md). **Do not open public deposits** until the checklist in §8 of
+> that document is complete.
+
 You need three NEAR mainnet accounts:
 
 | Account | Role | Key handling |
 |---|---|---|
-| `hugshire-owner.near` | Vault owner: allowlist, operator, pause, unpause | **Multisig** (for example a NEAR multisig contract or a hardware-wallet-held account); never on a server |
-| `hugshire-vault.near` | the Vault contract | full-access key deleted after deploy (or kept offline) |
-| `hugshire-operator.near` | worker hot key: `supply`, `distribute_yield`, `set_paused(true)` | function-call access key limited to the Vault; in your host's secret store |
+| `hugshire-owner.near` | Vault owner: approve or retire causes, set the keeper, pause, time-boxed withdrawal pause, open deposits | **Multisig** (for example a NEAR multisig contract or a hardware-wallet-held account); never on a server |
+| `hugshire-vault.near` | the Vault contract | full-access key deleted after deploy (no upgrade path by design) |
+| `hugshire-keeper.near` | worker hot key: `process_deposits`, `supply`, `auto_deliver` (only within each user's grant), pause (not unpause) | function-call access key limited to the Vault; in your host's secret store |
 
-Build and test the contract. Docker works everywhere:
-
-```bash
-docker run --rm -v "$PWD/contracts/vault:/work" -w /work rust:1 sh -c "cargo test"
-```
+Build and run all contract tests (unit + NEAR sandbox integration against mock USDC and mock RHEA):
 
 ```bash
-docker run --rm -v "$PWD/contracts/vault:/work" -w /work rust:1 sh -c "rustup target add wasm32-unknown-unknown && RUSTFLAGS='-C link-arg=-s -C target-cpu=mvp' cargo build --target wasm32-unknown-unknown --release"
+docker run --rm -v "$PWD/contracts:/work" -w /work rust:1 sh run-tests.sh
 ```
 
-For production, prefer a reproducible build with `cargo near build` (https://github.com/near/cargo-near).
+For production, use a reproducible build with `cargo near build` (https://github.com/near/cargo-near)
+and record the code hash.
 
-Deploy and initialise (with near-cli-rs):
+Deploy and initialise (with near-cli-rs). Deposits start **closed**:
 
 ```bash
-near contract deploy hugshire-vault.near use-file target/wasm32-unknown-unknown/release/hugshire_vault.wasm with-init-call new json-args '{"owner_id":"hugshire-owner.near","operator_id":"hugshire-operator.near","usdc":"17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1","rhea":"contract.main.burrow.near"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' network-config mainnet sign-with-keychain send
+near contract deploy hugshire-vault.near use-file hugshire_vault.wasm with-init-call new json-args '{"owner_id":"hugshire-owner.near","keeper_id":"hugshire-keeper.near","usdc":"17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1","rhea":"contract.main.burrow.near"}' prepaid-gas '100 Tgas' attached-deposit '0 NEAR' network-config mainnet sign-with-keychain send
 ```
 
-Register the Vault with USDC and RHEA (storage). RHEA's minimum is 0.1 NEAR:
+Register the Vault with USDC and RHEA (storage). RHEA's minimum is 0.1 NEAR. Also keep about 1 NEAR
+on the Vault account to pay for supporters' storage:
 
 ```bash
 near contract call-function as-transaction 17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1 storage_deposit json-args '{"account_id":"hugshire-vault.near"}' prepaid-gas '30 Tgas' attached-deposit '0.00125 NEAR' sign-as hugshire-owner.near network-config mainnet sign-with-keychain send
@@ -194,18 +196,22 @@ near contract call-function as-transaction 17208628f84f5d6ad33f0da3bbbeb27ffcb39
 near contract call-function as-transaction contract.main.burrow.near storage_deposit json-args '{"account_id":"hugshire-vault.near"}' prepaid-gas '30 Tgas' attached-deposit '0.1 NEAR' sign-as hugshire-owner.near network-config mainnet sign-with-keychain send
 ```
 
-Give the operator a **function-call-only** key on its own account. Then set
-`NEAR_VAULT_CONTRACT`, `NEAR_OPERATOR_ACCOUNT` and `NEAR_OPERATOR_PRIVATE_KEY` (`ed25519:...`).
+Give the keeper a **function-call-only** key on its own account. Then set
+`NEAR_VAULT_CONTRACT`, `NEAR_OPERATOR_ACCOUNT` (the keeper) and `NEAR_OPERATOR_PRIVATE_KEY` (`ed25519:...`).
 
-Allowlisting a cause's receiving account is an **owner** action. Do it only after verifying the
+Approving a cause's receiving account is an **owner** action. Do it only after verifying the
 organisation out of band, then click "Verify receiving account" in `/admin/organizations`:
 
 ```bash
-near contract call-function as-transaction hugshire-vault.near add_recipient json-args '{"account_id":"theorg.near"}' prepaid-gas '30 Tgas' attached-deposit '0 NEAR' sign-as hugshire-owner.near network-config mainnet sign-with-keychain send
+near contract call-function as-transaction hugshire-vault.near approve_cause json-args '{"account_id":"theorg.near"}' prepaid-gas '30 Tgas' attached-deposit '0 NEAR' sign-as hugshire-owner.near network-config mainnet sign-with-keychain send
 ```
 
-The receiving account must also have a USDC `storage_deposit`. If it doesn't, RHEA's transfer
-fails and the payout is retried and then flagged.
+Approving a cause sends it nothing by itself. Money moves only when a supporter's own policy or
+signed donation names that cause. The receiving account needs a USDC `storage_deposit`; if it
+doesn't have one, the payout fails safely and the supporter's shares are restored.
+
+For the controlled mainnet test, allow only team accounts with `add_depositor`. Open deposits to
+the public (`set_deposits_public true`) only after the release checklist.
 
 ## 6. NEAR Intents 1Click
 

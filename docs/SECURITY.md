@@ -29,21 +29,39 @@ applies (https://docs.privy.io/security).
 - **Session secret, CDP secret, 1Click key, Privy key, R2 keys:** host secret store only, never in
   the repository (`.gitignore` excludes `.env*`). Rotate on staff changes.
 
-## On-chain invariants (contracts/vault)
+## On-chain invariants (contracts/vault, v2)
 
-- `distribute_yield` requires: operator caller, not paused, an allowlisted recipient, a fresh memo,
-  and `assets − pending − amount ≥ total_principal`, checked against a fresh RHEA `get_account`
-  read in the callback. `pending_distribution` prevents two concurrent distributions from both
-  passing the check.
-- `withdraw` debits principal before the async calls and restores it if any step fails. It pays
-  `min(1, available / total_principal)` pro-rata.
-- Only the configured USDC contract can call `ft_on_transfer`.
-- Cross-contract results are read with `promise_result_checked` (64 KB cap) so an oversized response
-  cannot exhaust gas.
-- **Known contract risks to review in audit:** RHEA `simple_withdraw` semantics when the recipient
-  lacks storage; behaviour if RHEA changes `extra_decimals`; rounding on `amount × 1e12`; gas limits
-  of the callback chains; the storage cost of `used_memos` growing forever; the absence of an upgrade
-  path (intentional; redeploying means migrating).
+The full design, worked examples and v1 audit are in [VAULT_V2.md](VAULT_V2.md).
+
+- **Shares, not pooled principal.** Each supporter's yield is `value(shares) − principal` on chain.
+  Donating burns the donor's shares at the current price, so no supporter's donation can reduce
+  another's value. Mint and redeem round down, burn rounds up, and a virtual-share offset blocks the
+  inflation attack.
+- **Principal only to its owner.** `withdraw` requires the supporter's full-access key (1 yocto) and
+  pays only that supporter, up to `min(principal, value)`.
+- **Yield only where the supporter said.**
+  - Full-key `donate` may go to any approved cause.
+  - A session key (function-call key, which cannot attach a deposit) may only donate to causes in the
+    supporter's own policy, within its daily cap.
+  - The keeper's `auto_deliver` works only for supporters with an unexpired grant. The contract
+    computes the amount (eligible yield, capped) and the split (the supporter's policy), and enforces
+    a minimum interval.
+- **Atomic pricing.** A vault lock spans each RHEA balance read and its final callback, so prices
+  never come from stale reads. Shares are debited before tokens move and restored exactly on any
+  failure. Donations are recorded only after the transfer succeeds. Payout ids are contract-generated
+  and move `Pending → Completed | Partial | Failed | Stale` once.
+- **Owner limits.** The owner cannot move funds. The withdrawal pause lasts at most 72 hours, with a
+  24-hour cooldown. Deposits start closed (allowlist only).
+- Only the configured USDC contract can call `ft_on_transfer`; stray transfers are not counted. Cross-contract results
+  are read with `promise_result_checked` (64 KB cap). Locked operations require ≥ 290 TGas so they always reach their
+  final callback.
+- **Open items for the audit:**
+  - deployed RHEA v0.16.2 behaviour, since its source is not public;
+  - the gas budget of the multi-cause payout chain;
+  - the griefing lock: holders can briefly block others (rate-limited to once a minute per user);
+  - stale-lock handling;
+  - storage paid by the vault for new members;
+  - no upgrade path (intentional).
 
 ## Application controls
 

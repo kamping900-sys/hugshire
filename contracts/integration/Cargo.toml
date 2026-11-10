@@ -1,0 +1,12 @@
+[package]
+name = "hugshire-integration"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Sandbox integration tests: Hugshire Vault v2 against mock USDC and mock RHEA."
+
+[dev-dependencies]
+near-workspaces = { version = "=0.24.0", default-features = false, features = ["install"] }
+tokio = { version = "1", features = ["full"] }
+anyhow = "1"
+serde_json = "1"

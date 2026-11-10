@@ -99,7 +99,7 @@ export async function verifyVaultDeposits(ctx: Ctx) {
     const w = await wallets(ctx, d.userId);
     const r = await rpc.txEvents(d.vaultTxHash, w.nearAccountId!, e.NEAR_VAULT_CONTRACT!);
     if (r.state === "pending") continue;
-    const ev = r.events.find((x) => x.event === "deposit" && x.data.owner === w.nearAccountId);
+    const ev = r.events.find((x) => x.event === "deposit_queued" && x.data.owner === w.nearAccountId);
     if (r.state === "failure" || r.signerId !== w.nearAccountId || !ev) {
       await setDepositStatus(ctx, d.id, "manual_review", "Vault deposit could not be verified on chain");
       await raiseAlert(ctx.db, { severity: "warning", code: "vault_deposit_unverified", message: `Deposit ${d.id} tx ${d.vaultTxHash} not verified`, dedupeKey: `vault_dep:${d.id}` });
@@ -135,12 +135,13 @@ export async function verifyVaultWithdrawals(ctx: Ctx) {
     const r = await rpc.txEvents(w.vaultTxHash, wal.nearAccountId!, e.NEAR_VAULT_CONTRACT!);
     if (r.state === "pending") continue;
     const ev = r.events.find((x) => x.event === "withdraw" && x.data.owner === wal.nearAccountId);
-    if (r.state === "failure" || !ev || BigInt(ev.data.principal) !== w.requestedMicro) {
+    // v2: amount = USDC paid; principal = basis released (larger than amount after a pool loss)
+    if (r.state === "failure" || !ev || BigInt(ev.data.amount) > w.requestedMicro) {
       await advanceWithdrawal(ctx, w.id, "manual_review", "Vault withdrawal could not be matched on chain");
       await raiseAlert(ctx.db, { severity: "warning", code: "vault_withdraw_unverified", message: `Withdrawal ${w.id} not verified`, dedupeKey: `vault_wd:${w.id}` });
       continue;
     }
-    await settleProtocolWithdrawal(ctx, w.id, BigInt(ev.data.paid), w.vaultTxHash);
+    await settleProtocolWithdrawal(ctx, w.id, BigInt(ev.data.amount), w.vaultTxHash);
     verified++;
   }
   return { verified };

@@ -24,9 +24,30 @@ Plainly stated, so nothing here is mistaken for done.
 5. **Operator `supply` call** is not scheduled by a job. Idle USDC in the Vault must be supplied with
    a manual call, or by a small job to add (`VaultLending` plus `NearRpc.functionCall`).
 
+## Vault v2 status (2026-11-08)
+
+- **v2 contract:** written and tested. 42 unit tests cover the share math, authorisation rules,
+  keeper limits, locking and the callback state transitions. 7 NEAR-sandbox integration tests (all
+  passing) run it against a standard NEP-141 token and a RHEA mock that follows RHEA v0.15.7
+  semantics.
+- **Never deployed, not audited.** Mainnet RHEA is v0.16.2, which has no public source. Its
+  behaviour must be confirmed with the controlled small-value test (VAULT_V2.md §8).
+- **The app's live path is only partly migrated to v2:**
+  - Done: event parsing, deposit verification, pool valuation, and switching off database-driven
+    payouts for live funds.
+  - Still to do:
+    - Make the portfolio read per-user shares and yield from `get_member`, instead of the
+      principal-based ledger.
+    - Add a keeper job that calls `process_deposits` and `auto_deliver` for supporters the app
+      sees as idle.
+    - Add a client signing flow for `set_policy`, the session key and `donate`. This depends on
+      the Privy client integration.
+- **Product and legal decision:** yield is committed to charity. Supporters can withdraw principal
+  only. This must be in the signed deposit terms and reviewed by counsel.
+
 ## Not production-hardened yet
 
-6. Vault contract **not audited**. No on-chain TVL cap. `used_memos` grows without bound.
+6. Vault contract **not audited**. No on-chain TVL cap yet (deposits are allowlist-only until review).
 7. No Content-Security-Policy header.
 8. Rate limiting is in-process, so it is only correct with one web instance.
 9. Alerts are stored and shown in `/admin` but are not pushed to Slack, email or phone.

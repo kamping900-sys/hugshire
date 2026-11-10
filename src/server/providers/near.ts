@@ -81,7 +81,7 @@ export class NearRpc {
           if (!log.startsWith("EVENT_JSON:")) continue;
           try {
             const e = JSON.parse(log.slice("EVENT_JSON:".length));
-            if (e.standard === "hugshire") events.push({ event: e.event, data: e.data });
+            if (e.standard === "hugshire") for (const d of Array.isArray(e.data) ? e.data : [e.data]) events.push({ event: e.event, data: d });
           } catch {
             /* ignore malformed */
           }

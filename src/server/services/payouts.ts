@@ -10,6 +10,9 @@ const MAX_ATTEMPTS = 3;
  * Only payout-ready causes of approved organisations are batched.
  */
 export async function batchPayouts(ctx: Ctx) {
+  // Vault v2: real-money payouts never come from this database batch. Supporters sign donate() and the
+  // keeper may call auto_deliver() only within each supporter's on-chain grant (docs/VAULT_V2.md §4).
+  if (ctx.environment === "live") return { created: 0, skipped: "live payouts are executed on chain by the vault" as const };
   const settings = await getSettings(ctx.db);
   if (settings.pausePayouts) return { created: 0, skipped: "paused" as const };
   const min = BigInt(settings.minPayoutMicro);

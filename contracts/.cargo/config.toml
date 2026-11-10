@@ -1,0 +1,4 @@
+# Contracts must be compiled with `--cfg near` so near-sdk uses the real on-chain host functions
+# (this is what `cargo near build` sets). Without it near-sdk silently uses non-chain fallbacks.
+[target.wasm32-unknown-unknown]
+rustflags = ["--cfg", "near", "-C", "link-arg=-s", "-C", "target-cpu=mvp"]
