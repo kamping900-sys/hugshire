@@ -83,3 +83,23 @@ Plainly stated, so nothing here is mistaken for done.
   - RHEA USDC: APR 8.96%, deposits and withdrawals enabled, `extra_decimals` 12.
   - 1Click: both USDC assets listed, and a dry quote of 10 USDC Base→NEAR returns 9.998 USDC in
     about 35 seconds.
+
+## V4 gameplay, economy and social money (2026-11-11)
+
+Details are in V4_GAMEPLAY_ECONOMY.md §11.
+
+- **Community Heart Pool** works end to end in sandbox: simulated revenue and a database stand-in for
+  the DAO. Live mode still needs:
+  - a Sputnik DAO (manageable in Trezu), with Hugshire holding only the proposer role;
+  - a real ad network that has passed policy review;
+  - a privacy-preserving uniqueness provider.
+
+  The Sputnik adapter is written but has not been run against mainnet.
+- **Ads:** only the simulated provider exists. Real ads are disabled by setting.
+- **Multiplayer presence** is in memory, so it only works with one web instance.
+- **Rhythm-game anti-cheat** is server-side but can't prove a human is playing. The stakes are capped
+  virtual resources only.
+- **Mini-game visuals** are drawn in code plus the existing mascot side sprites. There are no bespoke
+  chop or strike animation frames yet.
+- **Uniqueness** in sandbox is a stand-in attestation (a salted hash of the email). It is not proof
+  of personhood.

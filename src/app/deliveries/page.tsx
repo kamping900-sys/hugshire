@@ -126,7 +126,8 @@ export default async function Deliveries() {
                 split: prefs.split,
                 autoEnabled: prefs.autoEnabled,
                 autoThresholdUsd: (Number(prefs.autoThresholdMicro / 10_000n) / 100).toFixed(2),
-                inactivityTimeoutMinutes: Math.round(prefs.inactivityTimeoutSeconds / 60),
+                autoSchedule: prefs.autoSchedule,
+                autoIntervalDays: Math.max(1, Math.round(prefs.autoIntervalSeconds / 86400)),
               }}
             />
           </div>

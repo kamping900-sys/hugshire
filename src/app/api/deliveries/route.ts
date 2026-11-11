@@ -4,16 +4,17 @@ import { createDelivery, listDeliveries } from "@/server/services/deliveries";
 
 /**
  * Manual delivery. The body has no amount on purpose: the server delivers whatever yield the
- * supporter has actually earned and that is eligible now. Gameplay only picks when and where.
+ * supporter has actually earned and that is eligible now (optionally capped to the fruits the player
+ * harvested; never more than is eligible). Gameplay only picks when and where.
  */
 export const POST = route(
   {
     auth: "user",
     limit: 30,
-    schema: z.object({ causeId: z.string().uuid(), helperId: z.string().uuid().optional(), idempotencyKey: z.string().min(8).max(80) }),
+    schema: z.object({ causeId: z.string().uuid(), helperId: z.string().uuid().optional(), idempotencyKey: z.string().min(8).max(80), capMicro: z.string().regex(/^[0-9]{1,18}$/).optional() }),
   },
   async ({ body, user, ctx }) => {
-    const r = await createDelivery(ctx, { userId: user!.id, causeId: body.causeId, helperId: body.helperId, mode: "manual", idempotencyKey: body.idempotencyKey });
+    const r = await createDelivery(ctx, { userId: user!.id, causeId: body.causeId, helperId: body.helperId, mode: "manual", idempotencyKey: body.idempotencyKey, capMicro: body.capMicro ? BigInt(body.capMicro) : undefined });
     return { delivery: r.delivery, replay: r.replay };
   },
 );

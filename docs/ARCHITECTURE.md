@@ -161,3 +161,20 @@ See `src/server/db/schema.ts`.
 | `external:withdrawn` | money returned to the user |
 
 Every journal sums to zero, which is enforced in code and tested.
+
+## V4 additions (2026-11-11)
+
+**Two-level world.**
+- Level 1, the overworld (`/worldmap`): one tile per town.
+- Level 2, a detailed shared town (`/worldmap/town/[slug]`), rendered by `src/game/v4/TownGame.ts`.
+
+**Mini-games.** Standalone Pixi scenes in `src/game/v4/scenes.ts`, judged on the server by `src/server/services/game.ts`. Charts and judges in `src/game/v4/rules.ts` are shared between client and server.
+
+**Three separate economies:**
+- Personal vault (unchanged).
+- Community Heart Pool: `services/pool.ts`, with a Sputnik DAO or sandbox treasury in `providers/treasury.ts`.
+- Virtual construction: Wood and Stone, with no money accounts.
+
+The full map, rules and constants are in **V4_GAMEPLAY_ECONOMY.md**.
+
+**Running more than one Pixi application.** A page can host several at once, for example a town with a mini-game on top. They must be destroyed with `app.destroy({ removeView: true }, ...)`, never `destroy(true)`, because `true` releases Pixi global resources and breaks the other live applications.

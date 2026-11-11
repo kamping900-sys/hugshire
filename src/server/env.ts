@@ -45,6 +45,12 @@ const schema = z.object({
   S3_SECRET_ACCESS_KEY: z.string().optional(),
   S3_PUBLIC_BASE_URL: z.string().optional(),
 
+  // Community Heart Pool treasury (Sputnik DAO v2, manageable in Trezu). Optional.
+  POOL_DAO_ACCOUNT: z.string().optional(),
+  /** Function-call key with only the proposer role in the DAO: it can propose, never approve. */
+  POOL_PROPOSER_ACCOUNT: z.string().optional(),
+  POOL_PROPOSER_PRIVATE_KEY: z.string().optional(),
+
   // Monitoring
   ALERT_WEBHOOK_URL: z.string().url().optional(),
   WORKER_SECRET: z.string().optional(),

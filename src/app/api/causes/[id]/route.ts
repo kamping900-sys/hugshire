@@ -13,7 +13,7 @@ export const POST = route(
   { auth: "user", limit: 20, schema: z.discriminatedUnion("action", [z.object({ action: z.literal("submit") }), updateInput.extend({ action: z.literal("update") })]) },
   async ({ body, user, ctx, params }) => {
     if (body.action === "submit") await submitCause(ctx, user!.id, params.id);
-    else await postCauseUpdate(ctx, user!.id, params.id, { title: body.title, body: body.body });
+    else await postCauseUpdate(ctx, user!.id, params.id, { title: body.title, body: body.body, category: body.category, mediaUrl: body.mediaUrl, linkUrl: body.linkUrl });
     return { ok: true };
   },
 );

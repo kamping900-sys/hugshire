@@ -29,7 +29,7 @@ export class WorldScene {
     this.cities = cities;
     await this.app.init({ resizeTo: el, background: "#A9D7EA", antialias: true, resolution: Math.min(window.devicePixelRatio || 1, 2), autoDensity: true });
     if (this.destroyed) {
-      this.app.destroy(true);
+      this.app.destroy({ removeView: true });
       return;
     }
     el.appendChild(this.app.canvas);
@@ -51,7 +51,7 @@ export class WorldScene {
     this.cleanup.forEach((f) => f());
     try {
       this.bank?.destroy();
-      this.app.destroy(true, { children: true });
+      this.app.destroy({ removeView: true }, { children: true });
     } catch {
       /* not initialised */
     }

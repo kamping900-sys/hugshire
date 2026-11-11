@@ -75,7 +75,7 @@ const walkingNow = (e: { state: string }) => e.state === "walk";
 const MIN_ZOOM = 0.1;
 const MAX_ZOOM = 1.8;
 const PLAYER_SPEED = 150;
-const AUTO_AFTER_S = 45; // demo: idle → auto (production default is 1 hour)
+const AUTO_AFTER_S = 45; // idle → your helper wanders on its own. Cosmetic only: money auto-delivery is server-side and needs explicit authorisation (7-day fallback).
 
 const CAT_COLOR: Record<string, string> = {
   square: "#F58A3C", animals: "#E46F3E", food: "#7FB86F", health: "#E98C9A", education: "#5E8FD9",
@@ -146,7 +146,7 @@ export class WorldGame {
       autoDensity: true,
       preference: "webgl",
     });
-    if (this.destroyed) return this.app.destroy(true);
+    if (this.destroyed) return this.app.destroy({ removeView: true });
     el.appendChild(this.app.canvas);
     this.app.canvas.style.touchAction = "none";
     this.tex = new WorldTextures(this.app.renderer);
@@ -173,7 +173,7 @@ export class WorldGame {
       for (const t of this.groundCache.values()) t.destroy(true);
       for (const t of this.thumbCache.values()) t.destroy(true);
       this.tex?.destroy();
-      this.app.destroy(true, { children: true });
+      this.app.destroy({ removeView: true }, { children: true });
     } catch {
       /* not initialised */
     }

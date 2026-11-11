@@ -84,7 +84,7 @@ export class CityScene {
       autoDensity: true,
     });
     if (this.destroyed) {
-      this.app.destroy(true);
+      this.app.destroy({ removeView: true });
       return;
     }
     el.appendChild(this.app.canvas);
@@ -147,7 +147,7 @@ export class CityScene {
     this.cleanup.forEach((f) => f());
     try {
       this.bank?.destroy();
-      this.app.destroy(true, { children: true });
+      this.app.destroy({ removeView: true }, { children: true });
     } catch {
       /* not initialised yet */
     }

@@ -526,6 +526,11 @@ export class WorldTextures {
     return b;
   }
 
+  /** A manifest sprite by key (e.g. "prop:townHall"), or undefined if not loaded. */
+  baked(key: string): Baked | undefined {
+    return this.cache.get(key);
+  }
+
   prop(k: PropKind, v: number) {
     return this.cache.get(`prop:${k}:${v}`) ?? this.cache.get(`prop:${k}`) ?? this.bake(`prop:${k}:${v}`, () => drawWorldProp(k, v));
   }

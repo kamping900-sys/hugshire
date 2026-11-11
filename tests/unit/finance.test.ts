@@ -227,30 +227,45 @@ describe("deliveries", () => {
     expect(await w.db.select().from(deliveries)).toHaveLength(0);
   });
 
-  it("player inactive for more than an hour switches to auto; returning resumes manual", async () => {
+  it("V4: the inactivity fallback is 7 days and never moves money without explicit authorisation", async () => {
     const { u, h } = await setupWithYield();
+    const WEEK = 7 * 86400;
     const now = w.nowRef();
     const at = (s: number) => new Date(now.getTime() - s * 1000);
-    expect(effectiveMode({ controlPreference: "manual", lastPlayerActionAt: at(59 * 60) }, 3600, now).mode).toBe("manual");
-    expect(effectiveMode({ controlPreference: "manual", lastPlayerActionAt: at(61 * 60) }, 3600, now).mode).toBe("auto");
-    expect(effectiveMode({ controlPreference: "auto", lastPlayerActionAt: at(1) }, 3600, now).mode).toBe("auto");
+    expect(effectiveMode({ controlPreference: "manual", lastPlayerActionAt: at(WEEK - 60) }, WEEK, now).mode).toBe("manual");
+    expect(effectiveMode({ controlPreference: "manual", lastPlayerActionAt: at(WEEK + 60) }, WEEK, now).mode).toBe("auto");
 
-    // Recently active: auto-delivery leaves the yield alone.
     await recordPlayerAction(w.ctx, u.id, h.id);
+    // Not authorised: even after 8 days away, nothing moves.
+    w.advance(8 * 86400);
     expect((await runAutoDelivery(w.ctx)).delivered).toBe(0);
-    // Away for 61 minutes: auto mode delivers to the home cause.
-    w.advance(61 * 60);
+    // Authorised, but the player was just active: still nothing (fallback needs 7 idle days).
+    await w.db.insert(helperPreferences).values({ userId: u.id, autoEnabled: true, autoAuthorizedAt: w.nowRef() }).onConflictDoUpdate({ target: helperPreferences.userId, set: { autoEnabled: true, autoAuthorizedAt: w.nowRef() } });
+    await recordPlayerAction(w.ctx, u.id, h.id);
+    w.advance(3600);
+    expect((await runAutoDelivery(w.ctx)).delivered).toBe(0);
+    // Authorised and away for 7 days: delivers to the home cause.
+    w.advance(WEEK);
     expect((await runAutoDelivery(w.ctx)).delivered).toBe(1);
-    // Player comes back: manual again.
     const back = await recordPlayerAction(w.ctx, u.id, h.id);
-    expect(effectiveMode(back, 3600, w.nowRef()).mode).toBe("manual");
+    expect(effectiveMode(back, WEEK, w.nowRef()).mode).toBe("manual");
+  });
+
+  it("V4: an authorised schedule delivers without waiting for inactivity, at most once per interval", async () => {
+    const { u, h } = await setupWithYield();
+    await recordPlayerAction(w.ctx, u.id, h.id);
+    await w.db.insert(helperPreferences).values({ userId: u.id, autoEnabled: true, autoAuthorizedAt: w.nowRef(), autoSchedule: "schedule", autoIntervalSeconds: 86400, autoThresholdMicro: 1n }).onConflictDoNothing();
+    w.advance(60);
+    expect((await runAutoDelivery(w.ctx)).delivered).toBe(1);
+    w.advance(3600);
+    expect((await runAutoDelivery(w.ctx)).delivered).toBe(0);
   });
 
   it("auto mode honours a split rule and the threshold", async () => {
     const { cause, u } = await setupWithYield();
     const second = await w.approvedCause("Green Valley", "Fernhollow");
-    await w.db.insert(helperPreferences).values({ userId: u.id, deliveryRule: "split", split: [{ causeId: cause.id, bps: 7000 }, { causeId: second.cause.id, bps: 3000 }], autoThresholdMicro: 5_000_000n }).onConflictDoNothing();
-    w.advance(7200);
+    await w.db.insert(helperPreferences).values({ userId: u.id, deliveryRule: "split", split: [{ causeId: cause.id, bps: 7000 }, { causeId: second.cause.id, bps: 3000 }], autoThresholdMicro: 5_000_000n, autoEnabled: true, autoAuthorizedAt: w.nowRef() }).onConflictDoNothing();
+    w.advance(8 * 86400);
     expect((await runAutoDelivery(w.ctx)).delivered).toBe(0); // $2 < $5 threshold
     await w.db.update(helperPreferences).set({ autoThresholdMicro: 1_000_000n }).where(eq(helperPreferences.userId, u.id));
     expect((await runAutoDelivery(w.ctx)).delivered).toBe(2);

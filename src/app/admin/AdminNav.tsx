@@ -9,6 +9,7 @@ const TABS = [
   ["/admin/causes", "Causes"],
   ["/admin/transactions", "Transactions"],
   ["/admin/payouts", "Payouts"],
+  ["/admin/pool", "Community Pool"],
   ["/admin/health", "System health"],
 ];
 

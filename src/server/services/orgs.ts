@@ -44,7 +44,21 @@ export const causeInput = z.object({
   goalUsd: z.coerce.number().int().min(100).max(10_000_000),
 });
 
-export const updateInput = z.object({ title: z.string().trim().min(3).max(120), body: z.string().trim().min(10).max(4000) });
+const optionalUrl = z
+  .string()
+  .trim()
+  .max(500)
+  .optional()
+  .transform((v) => (v ? v : undefined))
+  .refine((v) => !v || v.startsWith("https://"), "Links must start with https://");
+export const updateInput = z.object({
+  title: z.string().trim().min(3).max(120),
+  body: z.string().trim().min(10).max(4000),
+  /** Notice Board category. "impact" is still the organisation's own report until Hugshire verifies it. */
+  category: z.enum(["news", "story", "progress", "impact"]).default("news"),
+  mediaUrl: optionalUrl,
+  linkUrl: optionalUrl,
+});
 
 const MAP_TYPE: Record<(typeof CAUSE_CATEGORIES)[number], "school" | "shelter" | "nature" | "care" | "food" | "rebuild"> = {
   education: "school",
@@ -169,7 +183,10 @@ export async function postCauseUpdate(ctx: Ctx, userId: string, causeId: string,
   const [c] = await ctx.db.select().from(causes).where(eq(causes.id, causeId));
   if (!c) throw notFound();
   await requireOrgMember(ctx, userId, c.orgId);
-  const [u] = await ctx.db.insert(causeUpdates).values({ causeId, authorId: userId, ...input, kind: "note" }).returning();
+  const [u] = await ctx.db
+    .insert(causeUpdates)
+    .values({ causeId, authorId: userId, title: input.title, body: input.body, category: input.category ?? "news", mediaUrl: input.mediaUrl ?? null, linkUrl: input.linkUrl ?? null, kind: "note" })
+    .returning();
   return u;
 }
 

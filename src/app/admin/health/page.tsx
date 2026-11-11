@@ -25,6 +25,16 @@ const LABELS: Record<keyof PlatformSettings, string> = {
   maxDepositMicro: "Maximum deposit (micro-USDC)",
   helperRenderCap: "Helpers drawn per city",
   helperRule: "Helper rule",
+  poolCharityBps: "Community Pool: charity share of finalized ad revenue (bps, 0 = not set)",
+  poolMinDepositMicro: "Community Pool: minimum held deposit (micro-USDC)",
+  poolHoldingDays: "Community Pool: holding period (days)",
+  poolAccountAgeDays: "Community Pool: minimum account age (days)",
+  poolChoiceDays: "Community Pool: days to choose causes",
+  poolCouncil: "Sandbox treasury council emails (comma-separated)",
+  poolThreshold: "Sandbox treasury approvals needed",
+  adsProductionEnabled: "Real ads enabled (keep off until approved)",
+  adMinIntervalSeconds: "Optional ads: minimum seconds between",
+  adDailyLimit: "Optional ads: daily limit",
 };
 
 export default async function Health() {

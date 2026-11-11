@@ -91,3 +91,29 @@ The full design, worked examples and v1 audit are in [VAULT_V2.md](VAULT_V2.md).
 - Operator key in a KMS or HSM-backed signer instead of an env var.
 - Wallet-screening (sanctions) for receiving accounts; KYB records for organisations.
 - Bug bounty and an incident response runbook.
+
+## V4: three separate accounting domains
+
+1. **Personal vault** (deposits, shares, principal, yield, deliveries, withdrawals). Unchanged.
+2. **Community Heart Pool:**
+   - It has its own `pool:*` ledger namespace and its own tables and treasury.
+   - It is funded only by finalized, received ad revenue × the published share.
+   - Simulated revenue is refused in live mode.
+   - Cycle steps are a strict state machine and every step is audited.
+   - Payouts are `unique(cycle, cause)` and booked once, then reconciled.
+   - The treasury is a Sputnik DAO with multi-party approval. Hugshire's key can only *propose*.
+   - The sandbox stand-in is labelled "not decentralized".
+3. **Virtual construction** (Wood and Stone):
+   - There are no money accounts. The only input is the verified ledger principal, used for scaling.
+   - The server owns sessions, the resource choice, the secret chart, judging, hearts, combo, caps,
+     cooldowns and the single commit.
+   - Client-sent scores or rewards are ignored.
+   - One open session per user. Rounds can't be submitted faster than real time, and replays are
+     refused by an optimistic lock.
+
+**Auto-delivery:** it moves money, so it needs a recorded authorisation (`auto_authorized_at`).
+Authorising and revoking are both audited. Inactivity alone (7-day fallback) never authorises
+anything.
+
+**Notice Board:** links must be https and are opened with `noopener noreferrer nofollow`. Posts can
+be reported and hidden by admins, with an audit log.

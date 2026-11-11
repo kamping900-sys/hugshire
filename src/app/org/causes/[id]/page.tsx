@@ -87,7 +87,10 @@ export default async function EditCause({ params }: { params: Promise<{ id: stri
           </Card>
           <Card className="p-6">
             <h3 className="font-extrabold">Post an update</h3>
-            <p className="mt-1 text-xs text-ink-soft">Updates show as &ldquo;from the organisation&rdquo;. Hugshire can mark one as verified real-world progress after checking evidence.</p>
+            <p className="mt-1 text-xs text-ink-soft">
+              Updates appear on your town&apos;s Notice Board as &ldquo;reported by the organisation&rdquo;. Hugshire can mark one as verified real-world impact after
+              checking evidence. Players can report posts; Hugshire moderates reports.
+            </p>
             <div className="mt-4">
               <ApiForm
                 path={`/api/causes/${c.id}`}
@@ -95,8 +98,22 @@ export default async function EditCause({ params }: { params: Promise<{ id: stri
                 submitLabel="Publish update"
                 successText="Published."
                 fields={[
+                  {
+                    name: "category",
+                    label: "Notice Board section",
+                    type: "select",
+                    defaultValue: "news",
+                    options: [
+                      { value: "news", label: "News" },
+                      { value: "story", label: "Story" },
+                      { value: "progress", label: "Progress report" },
+                      { value: "impact", label: "Impact evidence" },
+                    ],
+                  },
                   { name: "title", label: "Title", required: true, maxLength: 120 },
                   { name: "body", label: "What happened?", type: "textarea", required: true, maxLength: 4000 },
+                  { name: "mediaUrl", label: "Photo or video link (optional, https)", type: "url", maxLength: 500 },
+                  { name: "linkUrl", label: "Read-more link (optional, https)", type: "url", maxLength: 500 },
                 ]}
               />
             </div>
@@ -104,7 +121,8 @@ export default async function EditCause({ params }: { params: Promise<{ id: stri
               {updates.map((u) => (
                 <li key={u.id} className="text-sm">
                   <div className="flex items-center gap-2 font-semibold">
-                    {u.title} {u.kind === "verified_progress" && <Badge tone="leaf">Verified</Badge>}
+                    {u.title} <Badge tone="sky">{u.category}</Badge> {u.kind === "verified_progress" && <Badge tone="leaf">Verified</Badge>}
+                    {u.visibility === "hidden" && <Badge tone="berry">Hidden by moderation</Badge>}
                   </div>
                   <div className="text-xs text-ink-soft">{u.createdAt.toLocaleDateString("en-US")}</div>
                 </li>

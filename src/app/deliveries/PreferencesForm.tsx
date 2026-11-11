@@ -12,7 +12,8 @@ type Prefs = {
   split: { causeId: string; bps: number }[];
   autoEnabled: boolean;
   autoThresholdUsd: string;
-  inactivityTimeoutMinutes: number;
+  autoSchedule: "inactivity" | "schedule";
+  autoIntervalDays: number;
 };
 
 const RULES: { v: Prefs["deliveryRule"]; t: string; d: string }[] = [
@@ -60,8 +61,11 @@ export function PreferencesForm({ initial, causes }: { initial: Prefs; causes: C
     <form onSubmit={save} className="space-y-6">
       <label className="flex items-center justify-between gap-4 rounded-2xl bg-cream/70 p-4">
         <span>
-          <span className="block font-bold">Auto-delivery</span>
-          <span className="text-sm text-ink-soft">When you are away, your helper delivers earned yield using the rule below.</span>
+          <span className="block font-bold">I authorise automatic delivery</span>
+          <span className="text-sm text-ink-soft">
+            Off by default. When on, Hugshire may send your eligible yield (never your principal) to the causes chosen by the rule below, on the schedule
+            you pick. Being inactive never authorises anything by itself. You can turn this off at any time.
+          </span>
         </span>
         <input type="checkbox" className="h-6 w-6 accent-[#F58A3C]" checked={p.autoEnabled} onChange={(e) => set("autoEnabled", e.target.checked)} />
       </label>
@@ -145,10 +149,20 @@ export function PreferencesForm({ initial, causes }: { initial: Prefs; causes: C
           </div>
         </div>
         <div>
-          <label className="label" htmlFor="tmo">
-            Switch to auto after I&apos;m away for (minutes)
+          <label className="label" htmlFor="sch">
+            When
           </label>
-          <input id="tmo" className="field num" inputMode="numeric" value={p.inactivityTimeoutMinutes} onChange={(e) => set("inactivityTimeoutMinutes", Number(e.target.value.replace(/\D/g, "")) || 0)} />
+          <select id="sch" className="field" value={p.autoSchedule} onChange={(e) => set("autoSchedule", e.target.value as Prefs["autoSchedule"])}>
+            <option value="inactivity">Only after 7 days without playing</option>
+            <option value="schedule">On a schedule</option>
+          </select>
+          {p.autoSchedule === "schedule" && (
+            <div className="mt-2 flex items-center gap-2 text-sm">
+              Every
+              <input aria-label="Days between deliveries" className="field num w-20" inputMode="numeric" value={p.autoIntervalDays} onChange={(e) => set("autoIntervalDays", Number(e.target.value.replace(/\D/g, "")) || 1)} />
+              days
+            </div>
+          )}
         </div>
       </div>
 

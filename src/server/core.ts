@@ -110,6 +110,20 @@ export type PlatformSettings = {
   maxDepositMicro: string;
   helperRenderCap: number;
   helperRule: "one_per_deposit" | "one_per_cause";
+  // ── V4 Community Heart Pool (separate charitable treasury) ──
+  /** Share of finalized ad revenue that goes to the pool, in basis points. 0 = not configured (finalization refused). */
+  poolCharityBps: number;
+  poolMinDepositMicro: string;
+  poolHoldingDays: number;
+  poolAccountAgeDays: number;
+  poolChoiceDays: number;
+  /** Sandbox DAO council: comma-separated admin emails who can approve proposals (blank = ADMIN_EMAILS), and the approval threshold. */
+  poolCouncil: string;
+  poolThreshold: number;
+  /** Real advertising stays off until a provider and its policies are approved. */
+  adsProductionEnabled: boolean;
+  adMinIntervalSeconds: number;
+  adDailyLimit: number;
 };
 
 export const DEFAULT_SETTINGS: PlatformSettings = {
@@ -117,7 +131,8 @@ export const DEFAULT_SETTINGS: PlatformSettings = {
   pauseWithdrawals: false,
   pausePayouts: false,
   pauseAutoDelivery: false,
-  defaultInactivitySeconds: 3600,
+  /** V4: the inactivity fallback is 7 days, and only applies after explicit authorisation. */
+  defaultInactivitySeconds: 604800,
   yieldSettlementSeconds: 3600,
   minPayoutMicro: "1000000", // $1.00
   parcelSizeMicro: "1000", // $0.001 per heart parcel
@@ -125,6 +140,16 @@ export const DEFAULT_SETTINGS: PlatformSettings = {
   maxDepositMicro: "2500000000", // $2,500 (Coinbase weekly card limit)
   helperRenderCap: 24,
   helperRule: "one_per_deposit",
+  poolCharityBps: 0,
+  poolMinDepositMicro: "10000000", // $10
+  poolHoldingDays: 30,
+  poolAccountAgeDays: 30,
+  poolChoiceDays: 14,
+  poolCouncil: "",
+  poolThreshold: 2,
+  adsProductionEnabled: false,
+  adMinIntervalSeconds: 180,
+  adDailyLimit: 10,
 };
 
 export async function getSettings(db: Db): Promise<PlatformSettings> {

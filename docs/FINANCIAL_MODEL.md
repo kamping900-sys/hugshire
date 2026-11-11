@@ -114,3 +114,23 @@ transitions throw.
 7. Nothing is stuck (deposits > 2 h, withdrawals > 48 h, payouts > 1 h in flight).
 
 Failures raise deduplicated alerts that auto-resolve when the check passes again.
+
+## V4: Community Heart Pool ledger (separate namespace)
+
+| Journal | Debit | Credit |
+|---|---|---|
+| `pool_budget_transferred` | `pool:treasury_in_transit` | `pool:charity_commitment` |
+| `pool_treasury_funded` | `pool:treasury` | `pool:treasury_in_transit` |
+| `pool_allocated` (per supporter) | `pool:charity_commitment` | `pool:alloc:{user}` |
+| `pool_assigned` (choice or disclosed default) | `pool:alloc:{user}` | `pool:cause:{cause}:payable` |
+| `pool_carried_forward` | `pool:alloc:{user}` | `pool:charity_commitment` |
+| `pool_paid` (proposal executed) | `pool:cause:{cause}:payable` | `pool:treasury` |
+
+- Budget = floor(finalized revenue × share bps ÷ 10,000).
+- Carry-in = the open balance of `pool:charity_commitment` (earlier remainders plus carried-forward
+  allocations).
+- `per_tree = floor((budget + carry_in) ÷ eligible)`.
+- None of these journals touch `user:*`, `cause:*:yield_*` or `pool:lending`.
+
+Wood and Stone are not in the ledger at all: they are virtual (`construction_projects`,
+`resource_contributions`).

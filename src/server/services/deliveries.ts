@@ -57,6 +57,7 @@ export async function createDelivery(
     capMicro?: bigint;
   },
 ) {
+  if (i.capMicro !== undefined && i.capMicro <= 0n) throw new AppError("nothing_to_deliver", "Pick at least one ripe fruit to deliver.");
   const prior = await ctx.db
     .select()
     .from(deliveries)
@@ -228,11 +229,19 @@ export async function runAutoDelivery(ctx: Ctx) {
   let delivered = 0;
   for (const { userId } of candidates) {
     const prefs = await getPreferences(ctx, userId);
-    if (!prefs.autoEnabled) continue;
+    // Inactivity alone never grants permission to move money: an explicit, recorded authorisation is required.
+    if (!prefs.autoEnabled || !prefs.autoAuthorizedAt) continue;
     const hs = await ctx.db.select().from(helpers).where(eq(helpers.userId, userId));
     if (!hs.length) continue;
-    const allAuto = hs.every((h) => effectiveMode(h, prefs.inactivityTimeoutSeconds, now).mode === "auto");
-    if (!allAuto) continue;
+    if (prefs.autoSchedule === "schedule") {
+      // authorised schedule: no inactivity wait, but respect the interval
+      if (prefs.lastAutoDeliveryAt && now.getTime() - prefs.lastAutoDeliveryAt.getTime() < prefs.autoIntervalSeconds * 1000) continue;
+    } else {
+      // V4: never shorter than the platform fallback (7 days), even for preference rows saved before V4
+      const timeout = Math.max(prefs.inactivityTimeoutSeconds, settings.defaultInactivitySeconds);
+      const allAuto = hs.every((h) => effectiveMode(h, timeout, now).mode === "auto");
+      if (!allAuto) continue;
+    }
     const { eligibleMicro } = await yieldSummary(ctx, userId);
     if (eligibleMicro <= 0n || eligibleMicro < prefs.autoThresholdMicro) continue;
     const dests = await autoDestinations(ctx, userId);
@@ -251,6 +260,7 @@ export async function runAutoDelivery(ctx: Ctx) {
           capMicro: parts[k],
         });
         delivered++;
+        await ctx.db.update(helperPreferences).set({ lastAutoDeliveryAt: now }).where(eq(helperPreferences.userId, userId));
       } catch (e) {
         if (!(e instanceof AppError)) throw e;
       }

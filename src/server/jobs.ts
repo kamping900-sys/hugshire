@@ -8,6 +8,8 @@ import { expireStaleCheckouts, processDeposits, processWithdrawals } from "./ser
 import { reconcile } from "./services/reconcile";
 import { runYieldSnapshot } from "./services/yield";
 import { verifyVaultDeposits, verifyVaultWithdrawals } from "./services/live-steps";
+import { expireReservations, expireSessions, runAutoWorkers } from "./services/game";
+import { runPoolJobs } from "./services/pool";
 
 /** Each job: what it does and how often it runs (seconds). */
 export const JOBS = {
@@ -23,6 +25,12 @@ export const JOBS = {
   reconcile: { every: 600, run: (c: Ctx) => reconcile(c) },
   expire_checkouts: { every: 3600, run: (c: Ctx) => expireStaleCheckouts(c) },
   housekeeping: { every: 3600, run: (c: Ctx) => housekeeping(c) },
+  // V4: virtual construction economy (never touches money)
+  expire_game_sessions: { every: 30, run: (c: Ctx) => expireSessions(c) },
+  expire_plot_reservations: { every: 600, run: (c: Ctx) => expireReservations(c) },
+  auto_workers: { every: 600, run: (c: Ctx) => runAutoWorkers(c) },
+  // V4: Community Heart Pool (separate treasury)
+  pool_cycle: { every: 120, run: (c: Ctx) => runPoolJobs(c) },
 } as const;
 export type JobName = keyof typeof JOBS;
 

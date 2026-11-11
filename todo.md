@@ -38,6 +38,17 @@ Details for each step are in `docs/SETUP_GUIDE.md`. After each setup step, run `
 - [ ] Set every live environment variable listed in `.env.example`.
 - [ ] Add uptime monitoring on `/api/health`.
 
+## V4: Community Heart Pool, ads and game
+- [ ] Create the community treasury as a Sputnik DAO (for example in Trezu). Add council members and set the approval threshold. Give the Hugshire account only the proposer role. Set `POOL_DAO_ACCOUNT`, `POOL_PROPOSER_ACCOUNT` and `POOL_PROPOSER_PRIVATE_KEY`.
+- [ ] Do a small mainnet test of the Sputnik adapter: propose a $1 USDC transfer, approve it in Trezu, then check that the sync job books it.
+- [ ] Decide and publish the charity share of ad revenue (Admin → Community Pool). It is "not set" until you do.
+- [ ] Choose a privacy-preserving uniqueness provider for live mode. The sandbox uses a stand-in.
+- [ ] Choose an ad network. Read its current publisher policies, including charity messaging and rewarded formats, consent and invalid traffic, before enabling `adsProductionEnabled`.
+- [ ] Have counsel review the pool's wording, eligibility rules and default-beneficiary rule.
+- [ ] Tune the blueprint requirements and the reward constants after playtesting (`src/game/v4/town.ts`, `src/game/v4/rules.ts`).
+- [ ] Optional: bespoke chop and strike animation frames for the mini-games.
+- [ ] Move town presence to Redis or WebSockets before running more than one web instance.
+
 ## Legal and compliance
 - [ ] Get a lawyer's view on money-transmitter, securities, charitable-solicitation and tax questions.
 - [ ] Have terms, a privacy policy and the risk disclosures reviewed.
