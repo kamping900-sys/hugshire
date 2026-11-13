@@ -1,7 +1,7 @@
 /** Overworld summaries, detailed-town snapshots and lightweight multiplayer presence. */
 import { createHash } from "node:crypto";
-import { and, eq, inArray, sql } from "drizzle-orm";
-import { causes, cities, constructionProjects, deliveries, helpers, organizations, userProfiles } from "../db/schema";
+import { and, asc, eq, inArray, sql } from "drizzle-orm";
+import { causes, cities, constructionProjects, deliveries, helperPreferences, helpers, organizations, userProfiles } from "../db/schema";
 import { notFound, rows } from "../core";
 import type { Ctx } from "./context";
 import { myGameSummary, townState } from "./game";
@@ -64,7 +64,9 @@ export async function townSnapshot(ctx: Ctx, slug: string, viewerId: string | nu
   const notices = await noticeBoard(ctx, c.id);
   let me = null;
   if (viewerId) {
-    const [h] = await ctx.db.select().from(helpers).where(and(eq(helpers.userId, viewerId), eq(helpers.environment, ctx.environment))).limit(1);
+    const mine = await ctx.db.select().from(helpers).where(and(eq(helpers.userId, viewerId), eq(helpers.environment, ctx.environment))).orderBy(asc(helpers.createdAt));
+    const [pref] = await ctx.db.select({ a: helperPreferences.activeHelperId }).from(helperPreferences).where(eq(helperPreferences.userId, viewerId));
+    const h = mine.find((x) => x.id === pref?.a) ?? mine[0];
     const [prof] = await ctx.db.select().from(userProfiles).where(eq(userProfiles.userId, viewerId));
     me = {
       userId: viewerId,

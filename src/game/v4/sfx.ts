@@ -95,20 +95,6 @@ export const sfx = {
     tone(390, 0.16, "square", 0.07, 0.1);
   },
   read: () => tone(1040, 0.09, "sine", 0.09),
-  /** Each Stone button has its own pitch so patterns can be learned by ear. */
-  strike: (b: number, npc = false) => {
-    const f = [392, 523.25, 659.25, 783.99][b] ?? 440;
-    tone(f, 0.16, "triangle", npc ? 0.2 : 0.24);
-    noise(0.06, 0.15, 3000 + b * 400, 0, 3);
-  },
-  crack: (perfect: boolean) => {
-    noise(perfect ? 0.22 : 0.14, perfect ? 0.45 : 0.3, 2400, 0, 0.9);
-    if (perfect) tone(1568, 0.16, "sine", 0.09, 0.03);
-  },
-  turn: () => {
-    tone(660, 0.1, "sine", 0.12);
-    tone(990, 0.16, "sine", 0.12, 0.1);
-  },
   win: () => [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.18, "triangle", 0.13, i * 0.09)),
   over: () => [392, 330, 262].forEach((f, i) => tone(f, 0.24, "triangle", 0.12, i * 0.14)),
 };

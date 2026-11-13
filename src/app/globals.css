@@ -98,3 +98,178 @@ body {
     animation: none;
   }
 }
+
+/* ───────── playful entrance animations (landing + start wizard) ─────────
+   Use with style={{ "--d": "300ms" }} to stagger. Springy cubic-béziers give a soft overshoot. */
+@keyframes hs-pop {
+  0% { opacity: 0; transform: scale(0.2) rotate(-18deg); }
+  60% { opacity: 1; transform: scale(1.12) rotate(6deg); }
+  80% { transform: scale(0.96) rotate(-2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+@keyframes hs-drop {
+  0% { opacity: 0; transform: translateY(-60px) scaleY(1.2); }
+  55% { opacity: 1; transform: translateY(6px) scaleY(0.86) scaleX(1.08); }
+  75% { transform: translateY(-4px) scaleY(1.04); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes hs-rise {
+  0% { opacity: 0; transform: translateY(22px); filter: blur(6px); }
+  100% { opacity: 1; transform: none; filter: blur(0); }
+}
+@keyframes hs-bounce-in {
+  0% { opacity: 0; transform: translateY(30px) scale(0.7); }
+  60% { opacity: 1; transform: translateY(-6px) scale(1.05); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes hs-card-in {
+  0% { opacity: 0; transform: translateY(60px) scale(0.92) rotate(-1.5deg); }
+  60% { opacity: 1; transform: translateY(-8px) scale(1.01) rotate(0.4deg); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes hs-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes hs-settle {
+  0% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+@keyframes hs-wiggle {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-4deg); }
+  75% { transform: rotate(4deg); }
+}
+
+.hs-pop, .hs-drop, .hs-rise, .hs-bounce-in, .hs-card-in, .hs-fade {
+  animation-fill-mode: both;
+  animation-delay: var(--d, 0ms);
+}
+.hs-pop { animation-name: hs-pop; animation-duration: 900ms; animation-timing-function: cubic-bezier(0.34, 1.4, 0.64, 1); }
+.hs-drop { display: inline-block; animation-name: hs-drop; animation-duration: 800ms; animation-timing-function: cubic-bezier(0.3, 1.3, 0.6, 1); }
+.hs-rise { animation-name: hs-rise; animation-duration: 800ms; animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
+.hs-bounce-in { animation-name: hs-bounce-in; animation-duration: 700ms; animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
+.hs-card-in { animation-name: hs-card-in; animation-duration: 800ms; animation-timing-function: cubic-bezier(0.34, 1.3, 0.64, 1); }
+.hs-fade { animation-name: hs-fade; animation-duration: 700ms; animation-timing-function: ease-out; }
+.hs-settle { animation: hs-settle 2.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.hs-wiggle-hover:hover { animation: hs-wiggle 0.5s ease-in-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hs-pop, .hs-drop, .hs-rise, .hs-bounce-in, .hs-card-in, .hs-fade, .hs-settle, .hs-wiggle-hover:hover {
+    animation: none !important;
+  }
+}
+
+/* How it works modal: little looping touches */
+@keyframes hs-march { to { stroke-dashoffset: -28; } }
+.hs-march { animation: hs-march 1s linear infinite; }
+@keyframes hs-cloud { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(18px); } }
+.hs-cloud { animation: hs-cloud 12s ease-in-out infinite; }
+@keyframes hs-van-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+.hs-van img { animation: hs-van-bob 0.6s ease-in-out infinite; }
+@keyframes hs-chop-swing { 0%, 60%, 100% { transform: rotate(0); } 75% { transform: rotate(-28deg); } 85% { transform: rotate(10deg); } }
+.hs-chop img { transform-origin: 50% 90%; animation: hs-chop-swing 1.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .hs-march, .hs-cloud, .hs-van img, .hs-chop img { animation: none !important; }
+}
+@keyframes hs-nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
+.hs-nudge { animation: hs-nudge 1.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .hs-nudge { animation: none !important; } }
+@keyframes hs-ring { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.06); opacity: 0.7; } }
+.hs-ring { animation: hs-ring 1.4s ease-in-out infinite; }
+@keyframes hs-spin-slow { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .hs-ring { animation: none !important; } }
+
+/* payment success: money turns into your helper, who then drops into town */
+@keyframes hs-morph-out { 0% { transform: scale(1) rotate(0); opacity: 1; } 40% { transform: scale(1.18) rotate(-8deg); opacity: 1; } 100% { transform: scale(0) rotate(200deg); opacity: 0; } }
+.hs-morph-out { animation: hs-morph-out 0.7s cubic-bezier(0.5, 0, 0.75, 0) both; }
+@keyframes hs-fall { 0% { transform: translateY(0) scale(1); } 15% { transform: translateY(-24px) scale(1.05, 0.95); } 100% { transform: translateY(85vh) scale(0.9, 1.1); } }
+.hs-fall { animation: hs-fall 0.9s cubic-bezier(0.55, 0, 0.9, 0.4) both; }
+@keyframes hs-burst { 0% { transform: translate(0, 0) scale(0.3); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) scale(1.1); opacity: 0; } }
+.hs-burst { animation: hs-burst 0.9s ease-out both; animation-delay: var(--d, 0ms); }
+@keyframes hs-jiggle { 0%, 100% { transform: rotate(0) scale(1); } 20% { transform: rotate(-7deg) scale(1.04); } 40% { transform: rotate(6deg) scale(1.06); } 60% { transform: rotate(-4deg) scale(1.04); } 80% { transform: rotate(3deg); } }
+.hs-jiggle { animation: hs-jiggle 0.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .hs-morph-out, .hs-fall, .hs-burst, .hs-jiggle { animation: none !important; } }
+
+/* Wood game: hurt shake, logs flying into the building, glowing ad button */
+@keyframes hs-shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-8px) rotate(-3deg); } 40% { transform: translateX(7px) rotate(3deg); } 60% { transform: translateX(-5px); } 80% { transform: translateX(3px); } }
+.hs-shake { animation: hs-shake 0.45s ease-in-out; }
+@keyframes hs-fly { 0% { transform: translate(0, 0) rotate(0) scale(0.6); opacity: 0; } 10% { opacity: 1; } 50% { transform: translate(calc(var(--dx) * 0.5), -70px) rotate(220deg) scale(1); } 90% { opacity: 1; } 100% { transform: translate(var(--dx), -6px) rotate(420deg) scale(0.7); opacity: 0; } }
+.hs-fly { animation: hs-fly 0.9s cubic-bezier(0.3, 0.1, 0.4, 1) both; animation-delay: var(--d, 0ms); }
+@keyframes hs-glow { 0%, 100% { box-shadow: 0 4px 0 #8A6448, 0 0 0 0 rgba(255, 122, 47, 0.6); } 50% { box-shadow: 0 4px 0 #8A6448, 0 0 0 10px rgba(255, 122, 47, 0); } }
+.hs-glow { animation: hs-glow 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .hs-shake, .hs-fly, .hs-glow { animation: none !important; } }
+
+/* money → helper "evolution" */
+@keyframes hs-rays { to { transform: rotate(360deg); } }
+.hs-rays { animation: hs-rays 9s linear infinite; }
+@keyframes hs-shine { 0%, 100% { filter: brightness(1) drop-shadow(0 0 0 rgba(255, 230, 150, 0)); transform: scale(1); } 50% { filter: brightness(1.35) drop-shadow(0 0 22px rgba(255, 230, 150, 0.95)); transform: scale(1.06); } }
+.hs-shine { animation: hs-pop 0.6s cubic-bezier(0.34, 1.4, 0.64, 1) both, hs-shine 0.9s ease-in-out 0.6s infinite; }
+.hs-silhouette { filter: brightness(0) invert(1) drop-shadow(0 0 14px #FFF6D8) drop-shadow(0 0 30px #FFD27A); }
+/* money and helper swap, faster and faster (2.1 s) */
+@keyframes hs-evo-a {
+  0%, 22% { opacity: 1; transform: scale(1); } 23%, 33% { opacity: 0; transform: scale(1.12); } 34%, 44% { opacity: 1; transform: scale(1.04); } 45%, 52% { opacity: 0; } 53%, 60% { opacity: 1; transform: scale(1.08); }
+  61%, 66% { opacity: 0; } 67%, 71% { opacity: 1; transform: scale(1.12); } 72%, 75% { opacity: 0; } 76%, 78% { opacity: 1; } 79%, 81% { opacity: 0; } 82%, 83% { opacity: 1; } 84%, 100% { opacity: 0; transform: scale(1.2); }
+}
+@keyframes hs-evo-b {
+  0%, 22% { opacity: 0; transform: scale(0.9); } 23%, 33% { opacity: 1; transform: scale(1); } 34%, 44% { opacity: 0; } 45%, 52% { opacity: 1; transform: scale(1.05); } 53%, 60% { opacity: 0; }
+  61%, 66% { opacity: 1; transform: scale(1.1); } 67%, 71% { opacity: 0; } 72%, 75% { opacity: 1; } 76%, 78% { opacity: 0; } 79%, 81% { opacity: 1; } 82%, 83% { opacity: 0; } 84%, 100% { opacity: 1; transform: scale(1.25); }
+}
+.hs-evo-a { animation: hs-evo-a 2.1s linear both; }
+.hs-evo-b { animation: hs-evo-b 2.1s linear both; }
+@keyframes hs-flash-in { 0% { opacity: 0; } 100% { opacity: 1; } }
+.hs-flash-in { animation: hs-flash-in 0.35s ease-in both; }
+@keyframes hs-flash-out { 0% { opacity: 1; } 100% { opacity: 0; } }
+.hs-flash-out { animation: hs-flash-out 0.7s ease-out both; }
+@keyframes hs-shock { 0% { transform: scale(0.4); opacity: 1; border-width: 10px; } 100% { transform: scale(2.6); opacity: 0; border-width: 1px; } }
+.hs-shock { animation: hs-shock 0.9s ease-out both; }
+@keyframes hs-tada { 0% { transform: scale(0.3) translateY(20px); } 35% { transform: scale(1.18) translateY(-14px) rotate(-4deg); } 55% { transform: scale(0.94) rotate(3deg); } 70% { transform: scale(1.05) rotate(-2deg); } 85%, 100% { transform: scale(1) rotate(0); } }
+.hs-tada { animation: hs-tada 0.9s cubic-bezier(0.34, 1.4, 0.64, 1) both, floaty 2.4s ease-in-out 0.9s infinite; }
+@media (prefers-reduced-motion: reduce) { .hs-rays, .hs-shine, .hs-evo-a, .hs-evo-b, .hs-flash-in, .hs-flash-out, .hs-shock, .hs-tada { animation: none !important; } .hs-evo-a { opacity: 0; } }
+
+/* leaving the wizard: zoom into the helper, then the town's green takes over */
+@keyframes hs-zoomin { 0% { transform: scale(1); } 20% { transform: scale(0.92) translateY(6px); } 100% { transform: scale(7); opacity: 0.2; } }
+.hs-zoomin { animation: hs-zoomin 1.05s cubic-bezier(0.55, 0, 0.8, 0.3) both; }
+@keyframes hs-to-town { 0%, 45% { opacity: 0; } 100% { opacity: 1; } }
+.hs-to-town { animation: hs-to-town 1.1s ease-in both; }
+@media (prefers-reduced-motion: reduce) { .hs-zoomin, .hs-to-town { animation: none !important; } }
+
+/* hanging title board: a gentle swing */
+@keyframes hs-board-swing { 0%, 100% { transform: rotate(-1.2deg); } 50% { transform: rotate(1.2deg); } }
+.hs-board-swing { animation: hs-board-swing 4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .hs-board-swing { animation: none !important; } }
+
+/* world map: the stop board drops in; the van idles on the intro overlay */
+@keyframes hs-drop-in { 0% { transform: translateY(-120%); } 70% { transform: translateY(6%); } 100% { transform: translateY(0); } }
+.hs-drop-in { animation: hs-drop-in 0.55s cubic-bezier(0.34, 1.4, 0.64, 1) both; }
+@keyframes hs-van-idle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+.hs-van-idle { animation: hs-van-idle 0.5s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .hs-drop-in, .hs-van-idle { animation: none !important; } }
+
+/* town [E] prompt: a gentle bob and a pulsing ring around the key */
+@keyframes hs-prompt-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.hs-prompt-bob { animation: hs-pop 0.4s cubic-bezier(0.34, 1.4, 0.64, 1) both, hs-prompt-bob 1.2s ease-in-out 0.4s infinite; }
+@keyframes hs-key-ring { 0% { transform: scale(0.9); opacity: 0.9; } 100% { transform: scale(1.35); opacity: 0; } }
+.hs-key-ring { animation: hs-key-ring 1.2s ease-out infinite; }
+@media (prefers-reduced-motion: reduce) { .hs-prompt-bob, .hs-key-ring { animation: none !important; } }
+
+/* world-map strip: the town you're at bounces and glows */
+@keyframes hs-town-here { 0%, 100% { transform: translateY(0); box-shadow: 0 3px 0 #6B4A33, 0 0 0 0 rgba(255, 211, 77, 0.8); } 50% { transform: translateY(-4px); box-shadow: 0 3px 0 #6B4A33, 0 0 0 8px rgba(255, 211, 77, 0); } }
+.hs-town-here { animation: hs-town-here 1.1s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .hs-town-here { animation: none !important; } }
+
+/* mini game: taking damage */
+@keyframes hs-hurt { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
+.hs-hurt { background: radial-gradient(ellipse at center, rgba(226, 40, 30, 0) 40%, rgba(226, 40, 30, 0.55) 100%), rgba(226, 40, 30, 0.12); animation: hs-hurt 0.55s ease-out both; }
+@keyframes hs-heart-break { 0% { transform: scale(1) rotate(0); } 25% { transform: scale(1.35) rotate(-10deg); filter: brightness(1.6); } 55% { transform: scale(0.85) rotate(8deg) translateY(6px); } 100% { transform: scale(1) rotate(0); } }
+.hs-heart-break { animation: hs-heart-break 0.6s ease-out both; }
+@keyframes hs-heart-beat { 0%, 100% { transform: scale(1); } 12% { transform: scale(1.1); } 24% { transform: scale(0.97); } 36% { transform: scale(1.06); } }
+.hs-heart-beat { animation: hs-heart-beat 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .hs-hurt, .hs-heart-break, .hs-heart-beat { animation: none !important; } .hs-hurt { opacity: 0; } }
+
+/* building progress bar: stripes slide along */
+@keyframes hs-bar-stripes { to { background-position: 28px 0; } }
+.hs-bar-stripes { animation: hs-bar-stripes 1s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .hs-bar-stripes { animation: none !important; } }
+
+/* money journey: the coin hops along */
+@keyframes hs-coin-hop { 0% { transform: translate(0, 0); } 50% { transform: translate(6px, -6px); } 100% { transform: translate(12px, 0); } }
+.hs-coin-hop { animation: hs-coin-hop 0.9s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .hs-coin-hop { animation: none !important; } }

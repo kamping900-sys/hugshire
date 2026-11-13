@@ -9,14 +9,25 @@ import {
   applyRound,
   baseReward,
   comboBps,
-  judgeStone,
-  judgeWood,
+  barAt,
+  barAttempt,
+  judgeRound,
+  judgeStop,
+  MIN_GREEN,
+  MIN_YELLOW,
   pickResource,
-  stoneRound,
   tierOf,
   woodRound,
   type WoodRound,
 } from "@/game/v4/rules";
+
+/** A stop time that lands dead in the green zone (searched the way a perfect player would). */
+function perfectStop(a: ReturnType<typeof barAttempt>, offsetMs = 0) {
+  for (let t = 200; t < 8000; t += 2) if (judgeStop(a, t).result === "perfect" && judgeStop(a, t + offsetMs).result === "perfect") return t + offsetMs;
+  throw new Error("no perfect stop");
+}
+const perfectStops = (c: WoodRound) => c.attempts.map((a, i) => perfectStop(a, i % 2 ? 2 : 0));
+const claimed = (stops: (number | null)[]) => Math.ceil(stops.reduce<number>((x, t) => x + (t ?? 8000), 0) / 1000) + 1;
 import { BLUEPRINTS, plotsFor, ROADS, townLayout } from "@/game/v4/town";
 import { contribute, cooldowns, expireReservations, runAutoWorkers, startProject, startSession, submitRound, quitSession } from "@/server/services/game";
 import { fruitSplit, heartTree } from "@/server/services/heartTree";
@@ -35,104 +46,73 @@ afterEach(async () => {
 // ───────────────────────────── pure rules ─────────────────────────────
 
 describe("V4 rules: deposit-scaled, fixed-point rewards", () => {
-  it("$10 earns 0.01 per Hit; Perfect is 2×; no deposit earns nothing", () => {
-    expect(baseReward(10_000_000n)).toBe(10_000n); // 0.01 × 1e6
-    expect(actionReward(baseReward(10_000_000n), "perfect", 1)).toBe(20_000n);
+  it("$10 earns 0.5 per Hit; Perfect is 2×; no deposit earns nothing", () => {
+    expect(baseReward(10_000_000n)).toBe(500_000n); // 0.5 × 1e6
+    expect(actionReward(baseReward(10_000_000n), "perfect", 1)).toBe(1_000_000n);
     expect(baseReward(0n)).toBe(0n);
     expect(baseReward(999_999n)).toBe(0n); // below $1
   });
   it("is linear to $1,000, then diminishing (√)", () => {
-    expect(baseReward(1_000_000_000n)).toBe(RES_UNIT); // $1,000 → 1 per Hit
-    expect(baseReward(4_000_000_000n)).toBe(2n * RES_UNIT); // 4× money → 2×
-    expect(baseReward(100_000_000_000n)).toBe(10n * RES_UNIT); // 100× → 10×
+    expect(baseReward(1_000_000_000n)).toBe(50n * RES_UNIT); // $1,000 → 50 per Hit
+    expect(baseReward(4_000_000_000n)).toBe(100n * RES_UNIT); // 4× money → 2×
+    expect(baseReward(100_000_000_000n)).toBe(500n * RES_UNIT); // 100× → 10×
     // splitting within the knee never helps
     expect(baseReward(500_000_000n) * 2n).toBe(baseReward(1_000_000_000n));
   });
-  it("combo is bounded at 2×", () => {
-    expect(comboBps(1)).toBe(10_000n);
-    expect(comboBps(11)).toBe(15_000n);
-    expect(comboBps(500)).toBe(20_000n);
+  it("combo: min(1 + floor(combo / 5) × 0.05, 1.5)", () => {
+    expect(comboBps(0)).toBe(10_000n);
+    expect(comboBps(4)).toBe(10_000n);
+    expect(comboBps(5)).toBe(10_500n);
+    expect(comboBps(14)).toBe(11_000n);
+    expect(comboBps(24)).toBe(12_000n);
+    expect(comboBps(50)).toBe(15_000n);
+    expect(comboBps(500)).toBe(15_000n);
   });
-  it("server picks the resource: both missing → random, one done → the other, cooling → other, all cooling → wait", () => {
+  it("the server picks Wood (the only game); waits only if a cooldown is set", () => {
     const none = { wood: null, stone: null };
-    expect(pickResource({ wood: true, stone: true }, none, 0, 0.2)).toEqual({ kind: "play", resource: "wood" });
-    expect(pickResource({ wood: true, stone: true }, none, 0, 0.8)).toEqual({ kind: "play", resource: "stone" });
-    expect(pickResource({ wood: false, stone: true }, none, 0, 0.2)).toEqual({ kind: "play", resource: "stone" });
-    expect(pickResource({ wood: true, stone: true }, { wood: 100, stone: null }, 0, 0.1)).toEqual({ kind: "play", resource: "stone" });
-    expect(pickResource({ wood: true, stone: true }, { wood: 100, stone: 50 }, 0, 0.1)).toEqual({ kind: "wait", untilMs: 50 });
-    expect(pickResource({ wood: false, stone: false }, none, 0, 0.1)).toEqual({ kind: "done" });
+    expect(pickResource({ wood: true, stone: true }, none, 0)).toEqual({ kind: "play", resource: "wood" });
+    expect(pickResource({ wood: true, stone: false }, { wood: 100, stone: null }, 0)).toEqual({ kind: "wait", untilMs: 100 });
+    expect(pickResource({ wood: false, stone: true }, none, 0)).toEqual({ kind: "done" });
   });
 });
 
-describe("V4 Wood: player-driven rhythm with fake-outs (no memorisation)", () => {
-  const chart: WoodRound = {
-    game: "wood",
-    round: 0,
-    tier: 0,
-    durationMs: 4000,
-    events: [
-      { i: 0, t: 1000, kind: "log", variant: "normal", approachMs: 1000, zoneAt: 0.7, perfectMs: 50, hitMs: 140 },
-      { i: 1, t: 2000, kind: "fake", variant: "normal", approachMs: 1000, zoneAt: 0.7, perfectMs: 50, hitMs: 140, tellAt: 0.4 },
-      { i: 2, t: 3000, kind: "log", variant: "fast", approachMs: 1000, zoneAt: 0.7, perfectMs: 50, hitMs: 140 },
-    ],
-  };
-  it("holding back on a fake-out is a read that keeps the combo", () => {
-    const { judgements } = judgeWood(chart, [1000, 3100]);
-    expect(judgements.map((j) => j.result)).toEqual(["perfect", "fake_read", "hit"]);
-    const r = applyRound({ hearts: 3, combo: 0, bestCombo: 0, earnedMicro: 0n }, judgements, 1000n, 10n ** 12n);
-    expect(r.state.combo).toBe(2);
-    expect(r.state.hearts).toBe(3);
-    // the fake-out itself pays nothing
-    expect(r.applied.find((a) => a.result === "fake_read")!.rewardMicro).toBe(0n);
+describe("Wood: one timing bar, one button", () => {
+  const still = { n: 0, tier: 0 as const, start: 0, dir: 1 as const, speed: 0.5, accel: 0, zone: 0.5, zoneSpeed: 0, zoneDir: 1 as const, yellow: 0.3, green: 0.1 };
+  it("green = Perfect, yellow = Hit, outside = Miss, no chop = Miss", () => {
+    // indicator moves 0.5 bar/s from 0: reaches 0.5 (zone centre) at 1000 ms
+    expect(judgeStop(still, 1000).result).toBe("perfect");
+    expect(judgeStop(still, 1180).result).toBe("hit"); // 0.59: inside yellow (±0.15), outside green (±0.05)
+    expect(judgeStop(still, 400).result).toBe("miss"); // 0.2
+    expect(judgeStop(still, null)).toMatchObject({ result: "miss", reason: "timeout" });
+    expect(judgeStop(still, 9000)).toMatchObject({ result: "miss", reason: "timeout" });
   });
-  it("swinging at a fake-out is a Miss: lose a heart, combo resets", () => {
-    const { judgements } = judgeWood(chart, [1000, 2000, 3000]);
-    expect(judgements.find((j) => j.ref === 1)).toMatchObject({ result: "miss", reason: "fake_swing" });
-    const r = applyRound({ hearts: 3, combo: 0, bestCombo: 0, earnedMicro: 0n }, judgements, 1000n, 10n ** 12n);
-    expect(r.state.hearts).toBe(2);
-    expect(r.state.bestCombo).toBe(1);
+  it("the indicator bounces at the ends and the same maths runs everywhere", () => {
+    expect(barAt(still, 2000).indicator).toBeCloseTo(1, 5);
+    expect(barAt(still, 3000).indicator).toBeCloseTo(0.5, 5);
+    expect(judgeStop(still, 3000).result).toBe("perfect"); // second pass through the zone
   });
-  it("missing a real log and stray swings are Misses; three Misses end the game, keeping what was earned", () => {
-    const { judgements } = judgeWood(chart, [1000, 1600, 2600]);
-    const r = applyRound({ hearts: 3, combo: 0, bestCombo: 0, earnedMicro: 0n }, judgements, 1000n, 10n ** 12n);
+  it("difficulty rises with progress (never with deposit), zones stay readable", () => {
+    const easy = barAttempt(7, 0), hard = barAttempt(7, 40);
+    expect(tierOf(0)).toBe(0);
+    expect(tierOf(40)).toBe(3);
+    expect(easy.zoneSpeed).toBe(0); // easy: target stands still
+    expect(hard.yellow).toBeLessThan(easy.yellow);
+    for (let n = 0; n < 80; n++) {
+      const x = barAttempt(11, n);
+      expect(x.yellow).toBeGreaterThanOrEqual(MIN_YELLOW);
+      expect(x.green).toBeGreaterThanOrEqual(MIN_GREEN);
+      expect(x.green).toBeLessThan(x.yellow);
+      expect(barAt(x, 1234).zone).toBeGreaterThanOrEqual(x.yellow / 2 - 1e-9);
+    }
+    expect(woodRound(5, 3)).toEqual(woodRound(5, 3));
+  });
+  it("Perfect pays 2×, combo grows slowly, three Misses end the game keeping what was earned", () => {
+    const js = judgeRound({ game: "wood", round: 0, tier: 0, attempts: [still, still, still, still, still] }, [1000, 1180, 400, 400, 400]);
+    const r = applyRound({ hearts: 3, combo: 0, bestCombo: 0, earnedMicro: 0n }, js, 1000n, 10n ** 12n);
+    expect(r.applied.map((x) => x.rewardMicro)).toEqual([2000n, 1000n, 0n, 0n, 0n]);
     expect(r.state.hearts).toBe(0);
     expect(r.stopped).toBe("hearts");
-    expect(r.state.earnedMicro).toBe(2000n); // the Perfect before Game Over is preserved
-  });
-  it("charts are deterministic, fair (no overlapping windows) and get harder", () => {
-    expect(woodRound(42, 4)).toEqual(woodRound(42, 4));
-    for (const round of [0, 2, 5, 8, 14]) {
-      const c = woodRound(7, round);
-      for (let k = 1; k < c.events.length; k++) expect(c.events[k].t - c.events[k - 1].t).toBeGreaterThanOrEqual(c.events[k].hitMs * 2 + 120);
-      expect(c.events.some((e) => e.kind === "log")).toBe(true);
-    }
-    expect(woodRound(7, 0).events.every((e) => e.kind === "log")).toBe(true); // no fakes at first
-    expect(woodRound(7, 2).events.filter((e) => e.kind === "fake")).toHaveLength(1); // gentle introduction
-    expect(woodRound(7, 12).events[0].hitMs).toBeLessThan(woodRound(7, 0).events[0].hitMs);
-  });
-});
-
-describe("V4 Stone: call-and-response memory, up to four buttons", () => {
-  it("NPC demonstrates, player repeats: right button AND right time", () => {
-    const c = stoneRound(99, 7);
-    const perfect = c.expected.map((e) => ({ t: e.t, b: e.b }));
-    expect(judgeStone(c, perfect).judgements.every((j) => j.result === "perfect")).toBe(true);
-    const wrong = perfect.map((x, i) => (i === 1 ? { ...x, b: (x.b + 1) % c.buttons || (c.buttons > 1 ? 1 : 0) } : x));
-    if (c.buttons > 1) expect(judgeStone(c, wrong).judgements.find((j) => j.ref === 1)).toMatchObject({ result: "miss", reason: "wrong_button" });
-    const late = perfect.map((x, i) => (i === 0 ? { ...x, t: x.t + c.hitMs + 200 } : x));
-    expect(judgeStone(c, late).judgements.some((j) => j.result === "miss")).toBe(true);
-  });
-  it("progresses from 1 button to at most 4, with longer patterns", () => {
-    expect(stoneRound(1, 0).buttons).toBe(1);
-    expect(stoneRound(1, 4).buttons).toBe(2);
-    expect(Math.max(...Array.from({ length: 30 }, (_, r) => stoneRound(3, r).buttons))).toBe(4);
-    for (let r = 0; r < 30; r++) expect(stoneRound(5, r).demo.every((n) => n.b < 4)).toBe(true);
-    expect(stoneRound(1, 12).demo.length).toBeGreaterThan(stoneRound(1, 0).demo.length);
-    expect(tierOf(12)).toBe(3);
-  });
-  it("Wood and Stone are mechanically distinct: Stone has a demonstration, Wood has none", () => {
-    expect("demo" in stoneRound(1, 0)).toBe(true);
-    expect("demo" in woodRound(1, 0)).toBe(false);
+    expect(r.state.earnedMicro).toBe(3000n);
   });
 });
 
@@ -176,33 +156,36 @@ describe("V4 construction", () => {
     await expect(startProject(w.ctx, u.id, { causeId: cause.id, plotKey: "p1", blueprintKey: "cottage" })).rejects.toMatchObject({ code: "blueprint_size" });
     await expect(startProject(w.ctx, u.id, { causeId: cause.id, plotKey: "zz", blueprintKey: "cottage" })).rejects.toMatchObject({ code: "bad_plot" });
     await startProject(w.ctx, u.id, { causeId: cause.id, plotKey: "p5", blueprintKey: "cottage" });
-    await expect(startProject(w.ctx, u.id, { causeId: cause.id, plotKey: "p6", blueprintKey: "tent" })).rejects.toMatchObject({ code: "one_project" });
-    await expect(startProject(w.ctx, b.id, { causeId: cause.id, plotKey: "p5", blueprintKey: "gazebo" })).rejects.toMatchObject({ code: "plot_taken" });
+    await expect(startProject(w.ctx, u.id, { causeId: cause.id, plotKey: "p6", blueprintKey: "house" })).rejects.toMatchObject({ code: "one_project" });
+    await expect(startProject(w.ctx, b.id, { causeId: cause.id, plotKey: "p5", blueprintKey: "house" })).rejects.toMatchObject({ code: "plot_taken" });
+    await expect(startProject(w.ctx, b.id, { causeId: cause.id, plotKey: "p6", blueprintKey: "tent" })).rejects.toMatchObject({ code: "bad_blueprint" }); // retired for the MVP
     const noDeposit = await w.user("c@x.test");
-    await expect(startProject(w.ctx, noDeposit.id, { causeId: cause.id, plotKey: "p6", blueprintKey: "tent" })).rejects.toMatchObject({ code: "not_eligible" });
+    await expect(startProject(w.ctx, noDeposit.id, { causeId: cause.id, plotKey: "p6", blueprintKey: "house" })).rejects.toMatchObject({ code: "not_eligible" });
   });
 
   it("contributions are idempotent, clamped to the requirement, and complete the building", async () => {
     const { u, cause } = await supporter("a@x.test", 100);
-    const p = await startProject(w.ctx, u.id, { causeId: cause.id, plotKey: "p5", blueprintKey: "tent" }); // 180 W / 40 S
-    const c1 = await contribute(w.ctx, { projectId: p.id, userId: u.id, resource: "wood", amountMicro: 500n * RES_UNIT, source: "minigame", refKey: "s1" });
-    expect(c1.appliedMicro).toBe(180n * RES_UNIT);
-    const again = await contribute(w.ctx, { projectId: p.id, userId: u.id, resource: "wood", amountMicro: 500n * RES_UNIT, source: "minigame", refKey: "s1" });
+    const p = await startProject(w.ctx, u.id, { causeId: cause.id, plotKey: "p5", blueprintKey: "cottage" }); // 30,000 Wood (Wood only)
+    const c1 = await contribute(w.ctx, { projectId: p.id, userId: u.id, resource: "wood", amountMicro: 50_000n * RES_UNIT, source: "minigame", refKey: "s1" });
+    expect(c1.appliedMicro).toBe(30_000n * RES_UNIT);
+    expect(c1.completed).toBe(true);
+    const again = await contribute(w.ctx, { projectId: p.id, userId: u.id, resource: "wood", amountMicro: 50_000n * RES_UNIT, source: "minigame", refKey: "s1" });
     expect(again.replay).toBe(true);
-    const c2 = await contribute(w.ctx, { projectId: p.id, userId: u.id, resource: "stone", amountMicro: 40n * RES_UNIT, source: "minigame", refKey: "s2" });
-    expect(c2.completed).toBe(true);
+    // a finished building accepts nothing more
+    const c2 = await contribute(w.ctx, { projectId: p.id, userId: u.id, resource: "wood", amountMicro: 10n * RES_UNIT, source: "minigame", refKey: "s2" });
+    expect(c2.appliedMicro).toBe(0n);
     // the creator is free to start another one now
     await expect(startProject(w.ctx, u.id, { causeId: cause.id, plotKey: "p6", blueprintKey: "cottage" })).resolves.toBeTruthy();
   });
 
   it("idle reservations expire after 24h; started projects stay completable", async () => {
     const { u, cause } = await supporter("a@x.test", 100);
-    const p = await startProject(w.ctx, u.id, { causeId: cause.id, plotKey: "p5", blueprintKey: "tent" });
+    const p = await startProject(w.ctx, u.id, { causeId: cause.id, plotKey: "p5", blueprintKey: "cottage" });
     w.advance(25 * 3600);
     expect((await expireReservations(w.ctx)).expired).toBe(1);
     const [row] = await w.db.select().from(constructionProjects).where(eq(constructionProjects.id, p.id));
     expect(row.status).toBe("expired");
-    const p2 = await startProject(w.ctx, u.id, { causeId: cause.id, plotKey: "p5", blueprintKey: "gazebo" });
+    const p2 = await startProject(w.ctx, u.id, { causeId: cause.id, plotKey: "p5", blueprintKey: "house" });
     await contribute(w.ctx, { projectId: p2.id, userId: u.id, resource: "wood", amountMicro: RES_UNIT, source: "minigame", refKey: "x" });
     w.advance(30 * 86400);
     expect((await expireReservations(w.ctx)).expired).toBe(0);
@@ -220,27 +203,28 @@ describe("V4 server-authoritative sessions", () => {
     const { cause } = await playable();
     const poor = await w.user("poor@x.test");
     const [proj] = await w.db.select().from(constructionProjects).where(eq(constructionProjects.causeId, cause.id));
-    await expect(startSession(w.ctx, poor.id, proj.id)).rejects.toMatchObject({ code: "not_eligible" });
+    // free play: no deposit still plays, at 0.01 per Hit
+    const free = await startSession(w.ctx, poor.id, proj.id);
+    expect(free.kind === "play" && free.session.baseRewardMicro).toBe(RULES.freeBaseMicro);
+    if (free.kind === "play") await quitSession(w.ctx, poor.id, free.session.id);
     const { u, p } = { u: (await w.db.select().from(users).where(eq(users.email, "a@x.test")))[0], p: proj };
     const s = await startSession(w.ctx, u.id, p.id);
     expect(s.kind).toBe("play");
     if (s.kind !== "play") return;
-    expect(["wood", "stone"]).toContain(s.session.resource);
+    expect(s.session.resource).toBe("wood");
     expect(JSON.stringify(s.session, (_k, v) => (typeof v === "bigint" ? v.toString() : v))).not.toContain('"seed"');
-    expect(s.session.baseRewardMicro).toBe(RES_UNIT); // $1,000 → 1 per Hit
+    expect(s.session.baseRewardMicro).toBe(50n * RES_UNIT); // $1,000 → 50 per Hit
   });
 
-  it("judges raw timings, refuses too-fast and replayed rounds, commits once, then 5-minute cooldown per resource", async () => {
+  it("judges raw timings, refuses too-fast and replayed rounds, commits once, then a per-resource cooldown when enabled", async () => {
+    await setSetting(w.db, "gameCooldownSeconds", 300);
     const { u, p } = await playable();
     const s = await startSession(w.ctx, u.id, p.id);
     if (s.kind !== "play") throw new Error("expected play");
     const chart = s.session.chart!;
-    const perfectInput =
-      chart.game === "wood"
-        ? { swings: chart.events.filter((e) => e.kind === "log").map((e) => e.t + 7 * ((e.i % 3) - 1)) }
-        : { strikes: chart.expected.map((e, i) => ({ t: e.t + 9 * ((i % 3) - 1), b: e.b })) };
+    const perfectInput = { stops: perfectStops(chart) };
     await expect(submitRound(w.ctx, u.id, s.session.id, { round: 0, ...perfectInput })).rejects.toMatchObject({ code: "too_fast" });
-    w.advance(Math.ceil(chart.durationMs / 1000));
+    w.advance(claimed(perfectInput.stops));
     const r = await submitRound(w.ctx, u.id, s.session.id, { round: 0, ...perfectInput });
     expect(BigInt(r.session.earnedMicro)).toBeGreaterThan(0n);
     expect(r.session.hearts).toBe(3);
@@ -254,35 +238,27 @@ describe("V4 server-authoritative sessions", () => {
     const contribs = await w.db.select().from(resourceContributions);
     expect(contribs).toHaveLength(1);
     expect(contribs[0].amountMicro).toBe(BigInt(r.session.earnedMicro));
-    // independent cooldowns: the same resource waits 5 minutes, the other is free
+    // with a cooldown configured, Wood rests for 5 minutes
     const cd = await cooldowns(w.ctx, u.id);
-    expect(cd[s.session.resource]).toBeGreaterThan(w.nowRef().getTime());
-    const other = s.session.resource === "wood" ? "stone" : "wood";
-    expect(cd[other]).toBeNull();
-    const next = await startSession(w.ctx, u.id, p.id);
-    expect(next.kind === "play" && next.session.resource).toBe(other);
-    await quitSession(w.ctx, u.id, (next as { session: { id: string } }).session.id);
+    expect(cd.wood).toBeGreaterThan(w.nowRef().getTime());
     const wait = await startSession(w.ctx, u.id, p.id);
     expect(wait.kind).toBe("wait");
-    w.advance(RULES.cooldownSeconds + 1);
+    w.advance(301);
     expect((await startSession(w.ctx, u.id, p.id)).kind).toBe("play");
   });
 
-  it("caps a session at 1,000 resources (Perfect and combo count) and never trusts client rewards", async () => {
+  it("caps a session at 50,000 resources (Perfect and combo count) and never trusts client rewards", async () => {
     const { u, cause } = await supporter("rich@x.test", 2500);
     const p = await startProject(w.ctx, u.id, { causeId: cause.id, plotKey: "p1", blueprintKey: "townHall" });
     // force a huge base reward to hit the cap quickly
     const s = await startSession(w.ctx, u.id, p.id);
     if (s.kind !== "play") throw new Error();
-    await w.db.update(gameSessions).set({ baseRewardMicro: 400n * RES_UNIT }).where(eq(gameSessions.id, s.session.id));
+    await w.db.update(gameSessions).set({ baseRewardMicro: 20_000n * RES_UNIT }).where(eq(gameSessions.id, s.session.id));
     let cur = s.session;
     for (let k = 0; k < 6 && cur.status === "open"; k++) {
       const chart = cur.chart!;
-      const input =
-        chart.game === "wood"
-          ? { swings: chart.events.filter((e) => e.kind === "log").map((e) => e.t + 11 * ((e.i % 3) - 1)) }
-          : { strikes: chart.expected.map((e, i) => ({ t: e.t + 13 * ((i % 3) - 1), b: e.b })) };
-      w.advance(Math.ceil(chart.durationMs / 1000) + 1);
+      const input = { stops: perfectStops(chart) };
+      w.advance(claimed(input.stops));
       cur = (await submitRound(w.ctx, u.id, cur.id, { round: cur.round, ...input, ...({ rewardMicro: "999999999999" } as object) })).session;
     }
     expect(cur.status).toBe("ended");
@@ -304,6 +280,32 @@ describe("V4 server-authoritative sessions", () => {
   });
 });
 
+describe("V4 free play (no deposit)", () => {
+  it("earns 0.5 per Hit and stops at 500 resources per day, Wood and Stone combined", async () => {
+    const { u, cause } = await supporter("owner@x.test", 1000);
+    const p = await startProject(w.ctx, u.id, { causeId: cause.id, plotKey: "p1", blueprintKey: "school" });
+    const f = await w.user("free@x.test");
+    const s = await startSession(w.ctx, f.id, p.id);
+    if (s.kind !== "play") throw new Error("expected play");
+    expect(s.session.baseRewardMicro).toBe(RULES.freeBaseMicro);
+    // pretend they already earned 9.99 today
+    await w.db.insert(resourceContributions).values({ projectId: p.id, userId: f.id, environment: "sandbox", resource: "wood", amountMicro: RULES.freeDailyCapMicro - 500_000n, source: "minigame", refKey: "earlier" });
+    // a huge base would blow past the allowance; the server clamps the session to what is left
+    await w.db.update(gameSessions).set({ baseRewardMicro: 250n * RES_UNIT }).where(eq(gameSessions.id, s.session.id));
+    const chart = s.session.chart!;
+    const input = { stops: perfectStops(chart) };
+    w.advance(claimed(input.stops));
+    const r = await submitRound(w.ctx, f.id, s.session.id, { round: 0, ...input });
+    expect(r.session.status).toBe("ended");
+    expect(r.session.endReason).toBe("daily_limit");
+    expect(BigInt(r.session.earnedMicro)).toBe(500_000n);
+    // allowance used up: no new session today
+    await expect(startSession(w.ctx, f.id, p.id)).rejects.toMatchObject({ code: "daily_limit" });
+    w.advance(86400 + 1);
+    expect((await startSession(w.ctx, f.id, p.id)).kind).toBe("play");
+  });
+});
+
 describe("V4 auto workers", () => {
   it("produce ~25× slower than baseline manual play, hourly and idempotently, only with a deposit", async () => {
     const { u, cause } = await supporter("a@x.test", 1000);
@@ -311,7 +313,7 @@ describe("V4 auto workers", () => {
     expect((await runAutoWorkers(w.ctx)).applied).toBe(1);
     expect((await runAutoWorkers(w.ctx)).applied).toBe(0); // same hour: no double production
     const [row] = await w.db.select().from(constructionProjects).where(eq(constructionProjects.id, p.id));
-    expect(row.woodContributed + row.stoneContributed).toBe(RES_UNIT * RULES.autoBasePerHour);
+    expect(row.woodContributed + row.stoneContributed).toBe(50n * RES_UNIT * RULES.autoBasePerHour); // base 50 per Hit ($1,000) × 24 per hour
     expect(RULES.manualBaselineBasePerHour / RULES.autoBasePerHour).toBeGreaterThanOrEqual(10n);
     expect(RULES.manualBaselineBasePerHour / RULES.autoBasePerHour).toBeLessThanOrEqual(50n);
     w.advance(3600);
@@ -453,5 +455,62 @@ describe("V4 golden fruit and heart tree states", () => {
     expect(t.red.deliveredMicro).toBe(0n); // "delivered" only after the payout is confirmed
     expect(t.golden).toEqual([]);
     void helperPreferences;
+  });
+});
+
+describe("journey onboarding", () => {
+  it("lets a brand-new player go straight to planting (no helper yet, createHelper: false)", async () => {
+    const { onboard } = await import("@/server/services/journey");
+    const { helpers } = await import("@/server/db/schema");
+    const { cause } = await w.approvedCause();
+    const u = await w.user("newbie@hugshire.test");
+    await expect(onboard(w.ctx, u.id, { animal: "cat", nickname: "Miso", homeCauseId: cause.id, createHelper: false })).resolves.toBeTruthy();
+    expect(await w.db.select().from(helpers).where(eq(helpers.userId, u.id))).toHaveLength(0); // the deposit creates it
+    await onboard(w.ctx, u.id, { animal: "fox", nickname: "Ember", homeCauseId: cause.id });
+    const hs = await w.db.select().from(helpers).where(eq(helpers.userId, u.id));
+    expect(hs.map((h) => [h.animal, h.nickname])).toEqual([["fox", "Ember"]]);
+  });
+});
+
+describe("Wood: harder, faster", () => {
+  it("ramps quickly: still for 3 chops, then sliding targets, then double/triple bars", async () => {
+    const { BAR_TIERS } = await import("@/game/v4/rules");
+    expect([0, 2, 3, 9, 10, 19, 20].map(tierOf)).toEqual([0, 0, 1, 1, 2, 2, 3]);
+    expect(barAttempt(3, 2).zoneSpeed).toBe(0);
+    expect(barAttempt(3, 4).zoneSpeed).toBeGreaterThan(0); // 5th chop: the target slides
+    // round 2 (chops 10–14) is Hard: double, single, double
+    const r2 = woodRound(9, 2).attempts;
+    expect(r2.map((a) => [a.seq, a.size])).toEqual([[0, 2], [1, 2], [0, 1], [0, 2], [1, 2]]);
+    expect(r2[0].group).toBe(r2[1].group);
+    expect(r2[0].zone).toBeLessThan(r2[1].zone); // targets read left → right
+    expect(r2[1].speed).toBe(r2[0].speed); // one shared marker
+    // round 4 (chops 20–24) is Extreme: triple then double, with a shorter timer
+    const r4 = woodRound(9, 4).attempts;
+    expect(r4.map((a) => a.size)).toEqual([3, 3, 3, 2, 2]);
+    expect(r4[0].timeoutMs).toBe(BAR_TIERS[3].timeoutMs);
+    expect(r4[0].timeoutMs!).toBeLessThan(barAttempt(9, 0).timeoutMs!);
+  });
+
+  it("multi-target bars must be hit in order on one timeline", async () => {
+    const { claimedMs } = await import("@/game/v4/rules");
+    const base = { tier: 2 as const, start: 0, dir: 1 as const, speed: 0.5, accel: 0, zoneSpeed: 0, zoneDir: 1 as const, yellow: 0.2, green: 0.08, group: 10, size: 2, timeoutMs: 6000 };
+    const a = { ...base, n: 10, seq: 0, zone: 0.25 }; // marker reaches 0.25 at 500 ms
+    const b = { ...base, n: 11, seq: 1, zone: 0.75 }; // …and 0.75 at 1500 ms
+    const chart = { game: "wood" as const, round: 2, tier: 2 as const, attempts: [a, b] };
+    expect(judgeRound(chart, [500, 1500]).map((j) => j.result)).toEqual(["perfect", "perfect"]);
+    // second target "hit" before the first one: out of order = miss
+    expect(judgeStop(b, 1500, 1600)).toMatchObject({ result: "miss", reason: "order" });
+    // first target timed out: the second can't be played
+    expect(judgeRound(chart, [null, 1500]).map((j) => j.result)).toEqual(["miss", "miss"]);
+    // one shared timeline: the round claims 1500 ms, not 500 + 1500
+    expect(claimedMs(chart, [500, 1500])).toBe(1500);
+  });
+
+  it("the fading marker is presentation only", async () => {
+    const { markerHidden } = await import("@/game/v4/rules");
+    const faded = { n: 0, tier: 2 as const, start: 0, dir: 1 as const, speed: 0.5, accel: 0, zone: 0.5, zoneSpeed: 0, zoneDir: 1 as const, yellow: 0.3, green: 0.1, fade: { from: 800, to: 1300 } };
+    expect(markerHidden(faded, 1000)).toBe(true);
+    expect(markerHidden(faded, 1400)).toBe(false);
+    expect(judgeStop(faded, 1000).result).toBe("perfect"); // judged exactly the same while hidden
   });
 });

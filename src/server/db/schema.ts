@@ -196,6 +196,8 @@ export const helperPreferences = pgTable("helper_preferences", {
     .default("last_selected"),
   defaultCauseId: uuid("default_cause_id").references(() => causes.id),
   favoriteCauseId: uuid("favorite_cause_id").references(() => causes.id),
+  /** The helper the player walks around as (null = their first helper). */
+  activeHelperId: uuid("active_helper_id"),
   lastSelectedCauseId: uuid("last_selected_cause_id").references(() => causes.id),
   /** [{ causeId, bps }] summing to 10000 */
   split: jsonb("split").$type<{ causeId: string; bps: number }[]>().notNull().default([]),
@@ -597,7 +599,7 @@ export const gameSessions = pgTable(
     projectId: uuid("project_id").notNull().references(() => constructionProjects.id),
     resource: text("resource", { enum: RESOURCES }).notNull(),
     status: text("status", { enum: ["open", "ended"] }).notNull().default("open"),
-    endReason: text("end_reason", { enum: ["hearts", "cap", "quit", "timeout", "building_done", "invalid", "ineligible"] }),
+    endReason: text("end_reason", { enum: ["hearts", "cap", "quit", "timeout", "building_done", "invalid", "ineligible", "daily_limit"] }),
     seed: integer("seed").notNull(),
     /** Base reward per Hit, fixed at session start from the verified deposit (µresource). */
     baseRewardMicro: micro("base_reward_micro").notNull(),
@@ -814,3 +816,17 @@ export const storyReports = pgTable(
   },
   (t) => [uniqueIndex("story_report_once").on(t.updateId, t.reporterId)],
 );
+
+/** "For organisations" interest form on the landing page. Reviewed by admins; never auto-approved. */
+export const orgInquiries = pgTable("org_inquiries", {
+  id: id(),
+  orgName: text("org_name").notNull(),
+  contactName: text("contact_name").notNull(),
+  email: text("email").notNull(),
+  website: text("website"),
+  country: text("country"),
+  cause: text("cause").notNull(),
+  status: text("status", { enum: ["new", "contacted", "closed"] }).notNull().default("new"),
+  ip: text("ip"),
+  createdAt: createdAt(),
+});

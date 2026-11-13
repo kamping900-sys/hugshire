@@ -1,6 +1,6 @@
 /**
  * Sandbox-only sample data. Refuses to run in live mode.
- * Sample organisations are flagged is_sample and shown with a "Sample" badge everywhere.
+ * Sample organisations are fictional and flagged is_sample (admins see a "Sample" badge).
  * Sample supporters go through the real sandbox deposit flow, so the ledger stays consistent.
  * No yield is invented: it accrues over time from the live RHEA rate like any sandbox deposit.
  */
@@ -17,24 +17,24 @@ import type { AnimalKind } from "../src/lib/animals";
 
 const SAMPLES = [
   {
-    org: "Willowbrook Animal Haven (sample)",
-    desc: "A sample shelter used to demonstrate Hugshire in test mode.",
-    cause: { title: "Warm beds for winter", summary: "Insulated kennels and bedding so every animal sleeps warm.", category: "animals" as const, cityName: "Pawsbury", goalUsd: 800 },
+    org: "Willowbrook Animal Haven",
+    desc: "A volunteer-run shelter that rescues, treats and rehomes abandoned dogs and cats.",
+    cause: { title: "Keep our rescued animals warm this winter", summary: "Insulated kennels, thick bedding and heat lamps so the 40 dogs and cats in our care stay warm while they wait for a home.", more: "Our old kennels lose heat fast once temperatures drop. Every delivery goes towards insulated kennels, washable bedding and safe heat lamps, starting with the older animals and the newest arrivals.", category: "animals" as const, cityName: "Pawsbury", goalUsd: 800 },
   },
   {
-    org: "Bright Pages Reading Club (sample)",
-    desc: "A sample literacy programme used to demonstrate Hugshire in test mode.",
-    cause: { title: "A library corner in every classroom", summary: "Books and cozy reading nooks for early readers.", category: "education" as const, cityName: "Inkwell Hollow", goalUsd: 1500 },
+    org: "Bright Pages Reading Club",
+    desc: "Volunteers who bring books and reading time to primary schools that have few of their own.",
+    cause: { title: "A reading corner in every classroom", summary: "Shelves, cushions and age-right books for local primary classrooms, so children without books at home can read every day.", more: "Each corner costs about the same as a school trip and serves a whole class for years. We choose books with teachers and refresh them each term.", category: "education" as const, cityName: "Inkwell Hollow", goalUsd: 1500 },
   },
   {
-    org: "Green Thread Community Gardens (sample)",
-    desc: "A sample community garden network used to demonstrate Hugshire in test mode.",
-    cause: { title: "Rebuild the riverside garden", summary: "Raised beds, tools and seedlings for a flood-damaged garden.", category: "nature" as const, cityName: "Fernhollow", goalUsd: 1000 },
+    org: "Green Thread Community Gardens",
+    desc: "Neighbourhood gardens where families grow fresh food together.",
+    cause: { title: "Rebuild our flood-damaged garden", summary: "Spring floods washed away our riverside plots. New raised beds, tools and seedlings will let 60 families grow vegetables again.", more: "We're rebuilding the beds higher off the ground so the next flood does less damage, and replacing the tools and seed stock we lost.", category: "nature" as const, cityName: "Fernhollow", goalUsd: 1000 },
   },
   {
-    org: "Full Plate Kitchen (sample)",
-    desc: "A sample food bank used to demonstrate Hugshire in test mode.",
-    cause: { title: "Weekend meal kits", summary: "Nutritious weekend meals for families who need them.", category: "food" as const, cityName: "Ladle Lane", goalUsd: 1200 },
+    org: "Full Plate Kitchen",
+    desc: "A community kitchen and food bank cooking for families across the neighbourhood.",
+    cause: { title: "Weekend meals for school children", summary: "Many children rely on free school lunches during the week. Every Friday we send them home with healthy meals for the weekend.", more: "Each kit holds breakfast, lunch and dinner for two days, packed by volunteers on Thursday nights and handed out quietly at school.", category: "food" as const, cityName: "Ladle Lane", goalUsd: 1200 },
   },
 ];
 
@@ -72,7 +72,10 @@ async function main() {
     await decideOrganization(ctx, admin.id, org.id, "approved", "Sample data for test mode");
     await setPayoutAccount(ctx, owner.id, org.id, `${org.slug.slice(0, 40)}.sample.testnet`);
     await verifyPayoutAccount(ctx, admin.id, org.id, "Sample data for test mode");
-    const cause = await createCause(ctx, owner.id, org.id, { ...s.cause, description: `${s.cause.summary}\n\nThis is sample content for Hugshire's test mode. It is not a real organisation.` });
+    const { more, ...causeFields } = s.cause;
+    const cause = await createCause(ctx, owner.id, org.id, { ...causeFields, description: `${s.cause.summary}
+
+${more}` });
     await decideCause(ctx, admin.id, cause.id, "approved", "Sample data for test mode");
     causeIds.push(cause.id);
   }

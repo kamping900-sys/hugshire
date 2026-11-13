@@ -147,7 +147,7 @@ the overworld engine (tile streaming, LOD, minimap, camera), sprites and texture
 | Perfect / Hit | 2× / 1× base | `RULES.perfectQuality` |
 | Combo | +5% per consecutive success, capped at 2× | `comboBps` |
 | Session cap | 1,000 resources (Perfect and combo count) | `RULES.sessionCapMicro` |
-| Cooldown | 5 min, separate for Wood and Stone, applies after quit too | `RULES.cooldownSeconds` |
+| Cooldown | **Off by default** (owner decision, 2026-11-11). Admin setting `gameCooldownSeconds` (per resource, applies after quit too) can turn it back on | `gameCooldownSeconds` |
 | Max session | 6 min, then the server ends it | `RULES.sessionMaxSeconds` |
 | Daily safeguard | 10,000 per resource per rolling 24 h | `RULES.dailyCapMicro` |
 | Precision | integer µresources (1 = 1,000,000 µ); decimals are shown | `RES_UNIT` |
@@ -169,7 +169,7 @@ reward  = base × quality (1 or 2) × combo (1.00 … 2.00), clamped to the sess
 | $1,000 | 1 |
 | $4,000 | 2 |
 | $100,000 | 10 |
-| below $1 | 0: no production |
+| below $1 (no deposit) | **free play: 0.01 per Hit, at most 10 per rolling 24 h (Wood + Stone combined)** |
 
 - The principal comes from the **double-entry ledger** (`user:*:principal`). The client never sends
   it. Pending withdrawals are excluded automatically.
@@ -357,3 +357,30 @@ allocations_calculated → choosing → payouts_prepared → awaiting_approval �
 - 🟡 The live app still reads balances from the ledger cache, not `vault.get_member` (unchanged, see
   KNOWN_LIMITATIONS).
 - Not production-ready: needs an audit, legal review of the pool and ad messaging, and load testing.
+
+
+---
+
+## Update (2026-11-12): Wood timing bar, Stone removed
+
+The owner replaced both rhythm games. This section overrides the Wood and Stone sections above.
+
+- **Stone is removed.** Wood is the only building material and the only mini-game.
+  - Buildable blueprints need 0 Stone.
+  - Migration `0002` reduced the Stone requirement of unfinished buildings to what they already had.
+  - Migration `0003` closed unfinished buildings on plots removed from the smaller town map.
+- **Wood is one timing bar with one button** (Space, click or tap).
+  - An indicator moves across the bar. Stopping it in the green zone is a Perfect (2×), in the yellow zone a Hit (1×), anywhere else a Miss.
+  - Taking longer than 8 seconds is also a Miss.
+- **Difficulty rises with chops attempted** (never with deposit size): Easy, then Medium (from chop 9), Hard (from chop 21), Extreme (from chop 36).
+  - Zones shrink and move, and the indicator speed varies and accelerates.
+  - Zones never get narrower than 12% (yellow) or 4% (green) of the bar.
+  - Every value is configurable in `BAR_TIERS` (`src/game/v4/rules.ts`).
+- **Combo:** `min(1 + floor(combo / 5) × 0.05, 1.5)`.
+  - Reward = base(deposit) × (2 for a Perfect, 1 for a Hit) × combo.
+  - 3 hearts, a 1,000-Wood session cap, and the same free-play limits as before.
+- **Server-authoritative play:**
+  - Each round reveals 5 attempts generated from a secret seed.
+  - The client sends only raw stop times. The server recomputes the bar and judges each stop.
+  - A round cannot be submitted sooner than the stop times it claims add up to, and a round can only be submitted once.
+- **Optional art slots:** `public/game/sprites/wood/` (background, clouds, stump, log, log_left, log_right, axe). Anything missing is drawn in code.

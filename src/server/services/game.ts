@@ -10,20 +10,18 @@
 import { randomInt } from "node:crypto";
 import { and, desc, eq, gte, inArray, isNull, lt, ne, sql } from "drizzle-orm";
 import { constructionProjects, gameSessions, helpers, resourceContributions, users, causes, cities, type Resource } from "../db/schema";
-import { AppError, acct, audit, forbidden, liabilityBalance, notFound } from "../core";
+import { AppError, acct, audit, forbidden, getSettings, liabilityBalance, notFound } from "../core";
 import { inTx, type Ctx } from "./context";
 import {
   RES_UNIT,
   RULES,
   applyRound,
   baseReward,
-  judgeStone,
-  judgeWood,
+  judgeRound,
+  claimedMs,
   pickResource,
-  stoneRound,
   suspiciouslyPrecise,
   woodRound,
-  type StoneRound,
   type WoodRound,
 } from "@/game/v4/rules";
 import { blueprint, isPlot } from "@/game/v4/town";
@@ -39,6 +37,17 @@ export async function eligiblePrincipal(ctx: Ctx, userId: string): Promise<bigin
   if (!u || u.status !== "active") return 0n;
   const p = await liabilityBalance(ctx.db, ctx.environment, acct.userPrincipal(userId));
   return p >= RULES.minEligiblePrincipalMicro ? p : 0n;
+}
+
+/** Free-play allowance left in the rolling 24 h (Wood + Stone together), for players without a deposit. */
+export async function freeAllowanceLeft(ctx: Ctx, userId: string): Promise<bigint> {
+  const since = new Date(ctx.now().getTime() - 86400_000);
+  const [d] = await ctx.db
+    .select({ s: sql<string>`coalesce(sum(${resourceContributions.amountMicro}),0)::text` })
+    .from(resourceContributions)
+    .where(and(eq(resourceContributions.userId, userId), eq(resourceContributions.source, "minigame"), gte(resourceContributions.createdAt, since)));
+  const left = RULES.freeDailyCapMicro - BigInt(d.s);
+  return left > 0n ? left : 0n;
 }
 
 // ───────────────────────────── construction ─────────────────────────────
@@ -77,6 +86,7 @@ export async function startProject(ctx: Ctx, userId: string, i: { causeId: strin
   const bp = blueprint(i.blueprintKey);
   if (!plot) throw new AppError("bad_plot", "That is not an approved building plot.");
   if (!bp) throw new AppError("bad_blueprint", "Unknown blueprint.");
+  if (!bp.mvp) throw new AppError("bad_blueprint", "That building is not available to build yet.");
   if (bp.size !== plot.size) throw new AppError("blueprint_size", `This plot fits ${plot.size === "S" ? "small" : plot.size === "M" ? "medium" : "large"} buildings only.`);
   const [c] = await ctx.db.select().from(causes).where(eq(causes.id, i.causeId));
   if (!c || c.status !== "approved") throw notFound("Town not found");
@@ -157,6 +167,7 @@ export async function contribute(ctx: Ctx, i: { projectId: string; userId: strin
 
 export async function cooldowns(ctx: Ctx, userId: string): Promise<Record<Resource, number | null>> {
   const out: Record<Resource, number | null> = { wood: null, stone: null };
+  const cooldownSeconds = (await getSettings(ctx.db)).gameCooldownSeconds;
   for (const r of ["wood", "stone"] as Resource[]) {
     const [last] = await ctx.db
       .select({ endedAt: gameSessions.endedAt })
@@ -164,7 +175,7 @@ export async function cooldowns(ctx: Ctx, userId: string): Promise<Record<Resour
       .where(and(eq(gameSessions.userId, userId), eq(gameSessions.resource, r), eq(gameSessions.status, "ended")))
       .orderBy(desc(gameSessions.endedAt))
       .limit(1);
-    let until = last?.endedAt ? last.endedAt.getTime() + RULES.cooldownSeconds * 1000 : 0;
+    let until = last?.endedAt ? last.endedAt.getTime() + cooldownSeconds * 1000 : 0;
     // daily safeguard
     const since = new Date(ctx.now().getTime() - 86400_000);
     const [d] = await ctx.db
@@ -179,8 +190,9 @@ export async function cooldowns(ctx: Ctx, userId: string): Promise<Record<Resour
 
 // ───────────────────────────── sessions ─────────────────────────────
 
-type Chart = WoodRound | StoneRound;
-const chartFor = (resource: Resource, seed: number, round: number): Chart => (resource === "wood" ? woodRound(seed, round) : stoneRound(seed, round));
+type Chart = WoodRound;
+/** Only Wood exists now (Stone was removed); older Stone sessions are ended by the expiry job. */
+const chartFor = (_resource: Resource, seed: number, round: number): Chart => woodRound(seed, round);
 
 /** What the client may see of a round: the chart only (never the seed or future rounds). */
 function publicRound(chart: Chart) {
@@ -227,7 +239,11 @@ export async function startSession(ctx: Ctx, userId: string, projectId: string) 
   if (p.status === "completed") return { kind: "done" as const };
   if (p.status === "expired") throw new AppError("project_expired", "This plot reservation expired.");
   const principal = await eligiblePrincipal(ctx, userId);
-  if (principal === 0n) throw new AppError("not_eligible", "An active deposit is needed to produce building resources.", 403);
+  const [acc] = await ctx.db.select({ status: users.status }).from(users).where(eq(users.id, userId));
+  if (!acc || acc.status !== "active") throw new AppError("not_eligible", "This account cannot play right now.", 403);
+  // Free play: no deposit still plays, at a tiny flat rate with a small daily allowance.
+  if (principal === 0n && (await freeAllowanceLeft(ctx, userId)) === 0n)
+    throw new AppError("daily_limit", "You've used today's free play (10 resources). Come back tomorrow, or support a cause to build faster.", 429);
   const open = await ctx.db.select().from(gameSessions).where(and(eq(gameSessions.userId, userId), eq(gameSessions.status, "open")));
   if (open.length) {
     // one session at a time, across tabs and devices: resume it instead of opening another
@@ -239,7 +255,6 @@ export async function startSession(ctx: Ctx, userId: string, projectId: string) 
     { wood: p.woodContributed < p.woodRequired, stone: p.stoneContributed < p.stoneRequired },
     cd,
     ctx.now().getTime(),
-    randomInt(0, 1_000_000) / 1_000_000,
   );
   if (pick.kind === "done") return { kind: "done" as const };
   if (pick.kind === "wait") return { kind: "wait" as const, untilMs: pick.untilMs, cooldowns: cd };
@@ -254,7 +269,7 @@ export async function startSession(ctx: Ctx, userId: string, projectId: string) 
         projectId,
         resource: pick.resource,
         seed,
-        baseRewardMicro: baseReward(principal),
+        baseRewardMicro: principal === 0n ? RULES.freeBaseMicro : baseReward(principal),
         principalMicro: principal,
         hearts: RULES.hearts,
         roundRevealedAt: now,
@@ -269,7 +284,8 @@ export async function startSession(ctx: Ctx, userId: string, projectId: string) 
   }
 }
 
-export type RoundInput = { round: number; swings?: number[]; strikes?: { t: number; b: number }[] };
+/** One stop time per attempt (ms since that attempt started); null = no chop before the timeout. */
+export type RoundInput = { round: number; stops: (number | null)[] };
 
 /** Judges one round of raw input timings and reveals the next round (or ends the session). */
 export async function submitRound(ctx: Ctx, userId: string, sessionId: string, input: RoundInput) {
@@ -284,34 +300,37 @@ export async function submitRound(ctx: Ctx, userId: string, sessionId: string, i
   }
   if (input.round !== s.round) throw new AppError("round_mismatch", "That round was already submitted.", 409);
   const chart = chartFor(s.resource, s.seed, s.round);
-  // a round cannot be finished faster than it takes to play it
-  if (now.getTime() - s.roundRevealedAt.getTime() < chart.durationMs - RULES.submitSlackMs) throw new AppError("too_fast", "Round submitted before it could have been played.", 422);
+  // a round cannot be submitted sooner than the stop times it claims (real time must have passed)
+  const stops = chart.attempts.map((_, i) => (i < input.stops.length ? input.stops[i] : null));
+  const claimed = claimedMs(chart, stops); // one timeline per multi-target group
+  if (now.getTime() - s.roundRevealedAt.getTime() < claimed - RULES.submitSlackMs) throw new AppError("too_fast", "Round submitted before it could have been played.", 422);
 
-  const { judgements } = chart.game === "wood" ? judgeWood(chart, input.swings ?? []) : judgeStone(chart, input.strikes ?? []);
-  // anti-automation: inhumanly consistent timing zeroes the round and flags the session
-  const raw = chart.game === "wood" ? input.swings ?? [] : (input.strikes ?? []).map((x) => x.t);
-  const targets = chart.game === "wood" ? chart.events.filter((e) => e.kind === "log").map((e) => e.t) : chart.expected.map((e) => e.t);
-  const deltas = raw.map((x) => {
-    let best = Infinity;
-    for (const t of targets) if (Math.abs(x - t) < Math.abs(best)) best = x - t;
-    return best;
-  }).filter((d) => Number.isFinite(d) && Math.abs(d) < 200);
+  const judgements = judgeRound(chart, stops);
+  // anti-automation: every chop dead-centre zeroes the round and flags the session
   const flags = [...s.stats.flags];
-  const precise = suspiciouslyPrecise(deltas);
+  const precise = suspiciouslyPrecise(judgements);
   if (precise) flags.push(`precise:r${s.round}`);
 
   // budget: session cap and what the building still needs right now
   const [p] = await ctx.db.select().from(constructionProjects).where(eq(constructionProjects.id, s.projectId));
   const remaining = p ? (s.resource === "wood" ? p.woodRequired - p.woodContributed : p.stoneRequired - p.stoneContributed) : 0n;
-  const budget = remaining < RULES.sessionCapMicro ? (remaining > 0n ? remaining : 0n) : RULES.sessionCapMicro;
+  let budget = remaining < RULES.sessionCapMicro ? (remaining > 0n ? remaining : 0n) : RULES.sessionCapMicro;
+  // free players: the session can never exceed what is left of today's free allowance
+  let freeCapped = false;
+  if (s.principalMicro === 0n) {
+    const freeBudget = (await freeAllowanceLeft(ctx, userId)) ;
+    if (freeBudget < budget) {
+      budget = freeBudget;
+      freeCapped = true;
+    }
+  }
   const base = precise ? 0n : s.baseRewardMicro;
   const r = applyRound({ hearts: s.hearts, combo: s.combo, bestCombo: s.bestCombo, earnedMicro: s.earnedMicro }, judgements, base, budget);
   const stats = { ...s.stats, flags };
   for (const a of r.applied) {
     if (a.result === "perfect") stats.perfect++;
     else if (a.result === "hit") stats.hit++;
-    else if (a.result === "miss") stats.miss++;
-    else stats.fakeouts++;
+    else stats.miss++;
   }
   // optimistic lock on the round number: a replayed or concurrent submission cannot apply twice
   const updated = await ctx.db
@@ -324,8 +343,8 @@ export async function submitRound(ctx: Ctx, userId: string, sessionId: string, i
   let reason: typeof s.endReason = null;
   if (flags.length >= 2) reason = "invalid";
   else if (r.stopped === "hearts") reason = "hearts";
-  else if (r.stopped === "cap") reason = budget < RULES.sessionCapMicro ? "building_done" : "cap";
-  else if (budget === 0n) reason = "building_done";
+  else if (r.stopped === "cap") reason = freeCapped ? "daily_limit" : budget < RULES.sessionCapMicro ? "building_done" : "cap";
+  else if (budget === 0n) reason = freeCapped ? "daily_limit" : "building_done";
   if (reason) cur = await endSession(ctx, s.id, reason);
   return { session: sessionView(cur, cur.status === "open" ? chartFor(cur.resource, cur.seed, cur.round) : null), applied: r.applied.map((a) => ({ ...a, rewardMicro: a.rewardMicro.toString() })) };
 }
@@ -383,7 +402,9 @@ export async function runAutoWorkers(ctx: Ctx) {
     if (!target) continue;
     const needWood = target.woodContributed < target.woodRequired;
     const needStone = target.stoneContributed < target.stoneRequired;
-    const resource: Resource = needWood && needStone ? (hour % 2 ? "stone" : "wood") : needWood ? "wood" : "stone";
+    void needStone;
+    const resource: Resource = "wood";
+    if (!needWood) continue;
     const amount = baseReward(principal) * RULES.autoBasePerHour;
     if (amount <= 0n) continue;
     const c = await contribute(ctx, { projectId: target.id, userId, resource, amountMicro: amount, source: "auto_worker", refKey: `auto:${userId}:${hour}` });
@@ -428,8 +449,13 @@ export async function myGameSummary(ctx: Ctx, userId: string) {
   const open = await ctx.db.select().from(gameSessions).where(and(eq(gameSessions.userId, userId), eq(gameSessions.status, "open")));
   return {
     eligible: principal > 0n,
+    /** Free play for anyone signed in; free players get a tiny rate and a daily allowance. */
+    canPlay: true,
+    freePlay: principal === 0n,
+    freeLeftMicro: principal === 0n ? await freeAllowanceLeft(ctx, userId) : null,
+    freeDailyCapMicro: RULES.freeDailyCapMicro,
     principalMicro: principal,
-    baseRewardMicro: baseReward(principal),
+    baseRewardMicro: principal === 0n ? RULES.freeBaseMicro : baseReward(principal),
     autoPerHourMicro: baseReward(principal) * RULES.autoBasePerHour,
     cooldowns: cd,
     ownProject: own ? { ...own.p, causeTitle: own.causeTitle, cityName: own.cityName } : null,

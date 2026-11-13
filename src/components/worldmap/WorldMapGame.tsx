@@ -277,7 +277,7 @@ export function WorldMapGame() {
             <div>
               <div className="text-xs font-black uppercase tracking-wider text-[#E46F3E]">{panel.subtitle}</div>
               <div className="text-2xl font-black leading-tight">{panel.name}</div>
-              <div className="text-xs font-bold text-[#7B6A5C]">{panel.real ? `by ${panel.org}${panel.isSample ? " · sample organisation (test mode)" : ""}` : "Sample tile · not a real cause"}</div>
+              <div className="text-xs font-bold text-[#7B6A5C]">{panel.real ? `by ${panel.org}` : "Sample tile · not a real cause"}</div>
             </div>
             <button onClick={() => setPanel(null)} aria-label="Close" className="rounded-full px-2 text-xl font-black text-[#7B6A5C] hover:bg-[#F6EDE2]">×</button>
           </div>
@@ -308,7 +308,7 @@ export function WorldMapGame() {
                 <button onClick={() => { game.current?.walkToCause(panel.id); setPanel(null); }} className={`${btnCls} py-2.5 text-sm`}>Walk here</button>
                 <button onClick={() => { game.current?.fastTravel(panel.id); setPanel(null); }} className={`${btnCls} py-2.5 text-sm`}>Fast travel</button>
               </div>
-              <p className="mt-3 text-[11px] font-semibold leading-snug text-[#7B6A5C]">Buildings are virtual and built with Wood and Stone. They show community effort; they are not proof of real-world impact. Real updates are on the town&apos;s Notice Board.</p>
+              <p className="mt-3 text-[11px] font-semibold leading-snug text-[#7B6A5C]">Buildings are virtual and built with Wood. They show community effort; they are not proof of real-world impact. Real updates are on the town&apos;s Notice Board.</p>
             </>
           ) : (
             <p className="mt-3 text-sm font-semibold text-[#7B6A5C]">This tile is decorative so the world feels lived-in. It isn&apos;t an organisation and can&apos;t receive anything. Real towns are listed under Towns.</p>

@@ -1,0 +1,1 @@
+ALTER TABLE "helper_preferences" ADD COLUMN "active_helper_id" uuid;

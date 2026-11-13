@@ -21,17 +21,7 @@ export async function processDeposits(ctx: Ctx) {
   for (const d of list) {
     try {
       if (ctx.environment === "sandbox") {
-        if (d.status === "onramp_completed") {
-          await recordBridge(ctx, d.id, d.requestedMicro, "sandbox-vault", "sandbox-refund");
-          await setDepositStatus(ctx, d.id, "bridging");
-        } else if (d.status === "bridging") {
-          await ctx.db.update(bridgeTransactions).set({ status: "SUCCESS", updatedAt: ctx.now() }).where(eq(bridgeTransactions.depositId, d.id));
-          await setDepositStatus(ctx, d.id, "bridged");
-        } else if (d.status === "bridged") {
-          await setDepositStatus(ctx, d.id, "vault_pending");
-        } else if (d.status === "vault_pending") {
-          await settleDepositSupplied(ctx, { depositId: d.id, principalMicro: d.requestedMicro, feesMicro: 0n, vaultTxHash: `sandbox-${d.id}` });
-        }
+        await sandboxStep(ctx, d);
         advanced++;
         continue;
       }
@@ -82,14 +72,34 @@ export async function processWithdrawals(ctx: Ctx) {
 }
 
 /** Sandbox checkout: the user clicked "Complete test payment". Live never calls this. */
+/** Test mode: moves a deposit one simulated step along (bridge → vault → RHEA). */
+async function sandboxStep(ctx: Ctx, d: typeof deposits.$inferSelect) {
+  if (d.status === "onramp_completed") {
+    await recordBridge(ctx, d.id, d.requestedMicro, "sandbox-vault", "sandbox-refund");
+    await setDepositStatus(ctx, d.id, "bridging");
+  } else if (d.status === "bridging") {
+    await ctx.db.update(bridgeTransactions).set({ status: "SUCCESS", updatedAt: ctx.now() }).where(eq(bridgeTransactions.depositId, d.id));
+    await setDepositStatus(ctx, d.id, "bridged");
+  } else if (d.status === "bridged") {
+    await setDepositStatus(ctx, d.id, "vault_pending");
+  } else if (d.status === "vault_pending") {
+    await settleDepositSupplied(ctx, { depositId: d.id, principalMicro: d.requestedMicro, feesMicro: 0n, vaultTxHash: `sandbox-${d.id}` });
+  }
+}
+
 export async function completeSandboxCheckout(ctx: Ctx, depositId: string, userId: string) {
   if (ctx.environment !== "sandbox") throw new Error("Sandbox checkout is disabled in live mode");
   const [d] = await ctx.db.select().from(deposits).where(eq(deposits.id, depositId));
   if (!d || d.userId !== userId) throw new Error("Deposit not found");
   if (d.status !== "onramp_pending") return d;
   await ctx.db.update(onrampTransactions).set({ status: "sandbox_completed", updatedAt: ctx.now() }).where(eq(onrampTransactions.depositId, d.id));
-  const u = await setDepositStatus(ctx, depositId, "onramp_completed");
+  let u = await setDepositStatus(ctx, depositId, "onramp_completed");
   await audit(ctx.db, { actorId: userId, actorType: "user", action: "deposit.sandbox_checkout", targetType: "deposit", targetId: depositId });
+  // run the rest of the simulated route now, so the player lands in town with an active deposit and helper
+  for (let k = 0; k < 4 && u.status !== "supplied"; k++) {
+    await sandboxStep(ctx, u);
+    [u] = await ctx.db.select().from(deposits).where(eq(deposits.id, depositId));
+  }
   return u;
 }
 

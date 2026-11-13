@@ -13,8 +13,12 @@ async function signIn(page: Page, email: string, next = "/portfolio") {
 
 test("home explains the product and discloses risk", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: /Where kindness/ })).toBeVisible();
-  await expect(page.getByText(/Test mode — no real money moves/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Hugshire", exact: true })).toBeVisible();
+  await expect(page.getByText("Where kindness takes shape.").first()).toBeVisible();
+  await expect(page.getByRole("link", { name: /Start helping/ })).toBeVisible();
+  await expect(page.getByText(/Test mode — no real money moves/)).toBeAttached();
+  // the full money details (linked from "How it works") carry the risk disclosure
+  await page.goto("/how-it-works");
   await expect(page.getByText(/not a bank/).first()).toBeVisible();
 });
 

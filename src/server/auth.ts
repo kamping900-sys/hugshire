@@ -82,7 +82,8 @@ export async function requestDevCode(db: Db, rawEmail: string) {
   const code = String(randomInt(0, 1_000_000)).padStart(6, "0");
   await db.insert(loginCodes).values({ email, codeHash: sha256(`${email}:${code}`), expiresAt: new Date(Date.now() + CODE_TTL_MIN * 60_000) });
   console.log(`[hugshire dev auth] sign-in code for ${email}: ${code}`);
-  return { email, devCode: env().NODE_ENV === "production" ? undefined : code };
+  // test mode only (email codes are refused in live mode above): hand the code back so the demo journey can fill it in
+  return { email, devCode: env().HUGSHIRE_MODE === "sandbox" ? code : undefined };
 }
 
 export async function verifyDevCode(db: Db, rawEmail: string, code: string) {

@@ -15,6 +15,90 @@
       "when": 1794375931029,
       "tag": "0001_v4_game_pool",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794462475848,
+      "tag": "0002_stone_removed",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794462996502,
+      "tag": "0003_close_removed_plots",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794467978829,
+      "tag": "0004_org_inquiries",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794469977108,
+      "tag": "0005_sample_cause_copy",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794470147090,
+      "tag": "0006_sample_cause_copy_fix",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794487429568,
+      "tag": "0007_active_helper",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794489291995,
+      "tag": "0008_sample_notices",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794489558705,
+      "tag": "0009_notice_photos",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794489622189,
+      "tag": "0010_hide_old_sample_post",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794492910386,
+      "tag": "0011_seed_construction",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794493721669,
+      "tag": "0012_wood_x100",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794536835224,
+      "tag": "0013_auto_daily_default",
+      "breakpoints": true
     }
   ]
 }

@@ -48,7 +48,6 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
             <Badge tone="sky">
               Stage {data.stage.index + 1} of 6 · {data.stage.name}
             </Badge>
-            {data.org.isSample && <Badge tone="ink">Sample organisation (test data)</Badge>}
             {!visible && <Badge tone="berry">Not public: {data.cause.status}</Badge>}
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{data.city.name}</h1>

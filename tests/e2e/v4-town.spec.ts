@@ -39,8 +39,8 @@ test("supporter: deposit, start a building, server picks the mini-game, quit com
   const started = await page.evaluate(async () => {
     const t = await fetch("/api/town/inkwell-hollow").then((r) => r.json());
     const taken = new Set(t.projects.map((p: { plotKey: string }) => p.plotKey));
-    const plot = ["p5", "p6", "p8", "p12", "p13", "p14", "p15", "p16"].find((k) => !taken.has(k));
-    const r = await fetch("/api/construction", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ causeId: t.town.id, plotKey: plot, blueprintKey: "tent" }) });
+    const plot = ["p5", "p6", "p8", "p10"].find((k) => !taken.has(k));
+    const r = await fetch("/api/construction", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ causeId: t.town.id, plotKey: plot, blueprintKey: "cottage" }) });
     const s = await fetch("/api/minigame/start", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ projectId: (await r.json()).project.id }) });
     return s.json();
   });

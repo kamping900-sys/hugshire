@@ -124,6 +124,8 @@ export type PlatformSettings = {
   adsProductionEnabled: boolean;
   adMinIntervalSeconds: number;
   adDailyLimit: number;
+  /** Wood/Stone cooldown after a session ends, per resource. 0 = no cooldown. */
+  gameCooldownSeconds: number;
 };
 
 export const DEFAULT_SETTINGS: PlatformSettings = {
@@ -139,7 +141,7 @@ export const DEFAULT_SETTINGS: PlatformSettings = {
   minDepositMicro: "5000000", // $5
   maxDepositMicro: "2500000000", // $2,500 (Coinbase weekly card limit)
   helperRenderCap: 24,
-  helperRule: "one_per_deposit",
+  helperRule: "one_per_cause",
   poolCharityBps: 0,
   poolMinDepositMicro: "10000000", // $10
   poolHoldingDays: 30,
@@ -150,6 +152,7 @@ export const DEFAULT_SETTINGS: PlatformSettings = {
   adsProductionEnabled: false,
   adMinIntervalSeconds: 180,
   adDailyLimit: 10,
+  gameCooldownSeconds: 0,
 };
 
 export async function getSettings(db: Db): Promise<PlatformSettings> {

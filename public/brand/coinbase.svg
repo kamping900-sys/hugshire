@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs><mask id="c"><rect width="512" height="512" fill="#000"/><circle cx="256" cy="256" r="163" fill="#fff"/><circle cx="256" cy="256" r="82" fill="#000"/><rect x="300" y="242" width="140" height="28" fill="#000"/></mask></defs>
+<rect width="512" height="512" rx="96" fill="#0052FF"/>
+<rect width="512" height="512" fill="#fff" mask="url(#c)"/>
+</svg>

@@ -1,0 +1,2 @@
+-- Auto-send daily is on by default. Turn it on for players who never chose (never authorised, never switched off); anyone who switched it off keeps their choice.
+UPDATE "helper_preferences" SET "auto_enabled" = true, "auto_authorized_at" = now(), "auto_schedule" = 'schedule', "auto_interval_seconds" = 86400, "delivery_rule" = 'default_cause' WHERE "auto_enabled" = false AND "auto_authorized_at" IS NULL AND "default_cause_id" IS NOT NULL;

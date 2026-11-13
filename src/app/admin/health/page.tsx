@@ -35,6 +35,7 @@ const LABELS: Record<keyof PlatformSettings, string> = {
   adsProductionEnabled: "Real ads enabled (keep off until approved)",
   adMinIntervalSeconds: "Optional ads: minimum seconds between",
   adDailyLimit: "Optional ads: daily limit",
+  gameCooldownSeconds: "Wood/Stone cooldown after a session (s, 0 = off)",
 };
 
 export default async function Health() {

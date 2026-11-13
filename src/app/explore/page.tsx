@@ -60,7 +60,6 @@ export default async function Explore({ searchParams }: { searchParams: Promise<
             <div className="flex flex-wrap items-center gap-2">
               <Badge tone="orange">{CAT_LABEL[c.cause.category]}</Badge>
               <Badge tone="sky">{c.stage.name}</Badge>
-              {c.org.isSample && <Badge tone="ink">Sample data</Badge>}
             </div>
             <div className="mt-3 text-xl font-extrabold">{c.city.name}</div>
             <div className="text-sm font-semibold text-ink-soft">

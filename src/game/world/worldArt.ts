@@ -506,6 +506,9 @@ export class WorldTextures {
           }
           const scale = m.height ? m.height / tex.height : m.width ? m.width / tex.width : 1;
           tex.source.scaleMode = "linear";
+          /* smooth downscaling (mipmaps): painted art is drawn far smaller than its source */
+          tex.source.autoGenerateMipmaps = true;
+          tex.source.updateMipmaps();
           this.cache.set(k, { tex, ax: m.ax ?? 0.5, ay: m.ay ?? 0.94, scale, art: true, walk: /^mascot:\w+:\w+:\d$/.test(k) });
         }),
       );

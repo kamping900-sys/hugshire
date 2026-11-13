@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { AnimalAvatar, ButtonLink, Notice, PageHeader } from "@/components/ui";
+import { AnimalAvatar, Notice, PageHeader } from "@/components/ui";
+import { BackButton } from "@/components/BackButton";
 
 export const metadata: Metadata = { title: "How it works" };
 
@@ -14,7 +15,12 @@ const flow = [
 
 export default function HowItWorks() {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10">
+    // full-screen page (covers the site menu): just the content and one Back button
+    <div className="fixed inset-0 z-[60] overflow-y-auto bg-cream">
+    <div className="sticky top-0 z-10 px-4 pt-4">
+      <BackButton />
+    </div>
+    <div className="mx-auto max-w-4xl px-4 pb-16 pt-4">
       <PageHeader eyebrow="How it works" title="The money model, in plain words">
         Hugshire is built so that your principal stays yours and only real yield reaches causes. Here is every step, including the parts that cost money or take time.
       </PageHeader>
@@ -79,9 +85,7 @@ export default function HowItWorks() {
           Hugshire is not a bank and is not insured. Yield is variable and can be zero. Your principal is not guaranteed: it depends on RHEA, on the Hugshire Vault contract (not yet independently audited), on USDC keeping its dollar value, and on the bridge. Withdrawals can be delayed by protocol liquidity. Don&apos;t put in money you might need urgently.
         </Notice>
       </div>
-      <div className="mt-8 flex gap-3">
-        <ButtonLink href="/explore">Explore the world</ButtonLink>
-      </div>
+    </div>
     </div>
   );
 }
