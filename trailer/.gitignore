@@ -1,0 +1,5 @@
+node_modules/
+footage/
+build/
+.cache/
+out/*.mp4

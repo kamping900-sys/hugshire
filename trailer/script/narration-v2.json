@@ -1,0 +1,212 @@
+{
+  "note": "V2 narration. Each 'group' is voiced in one pass (natural prosody across its sentences); 'say' is the spoken text (respelled names for clear pronunciation), 'cap' is the caption text. Group gaps are silence after the group.",
+  "voice": "af_heart",
+  "speed": 1,
+  "scenes": [
+    {
+      "id": "open",
+      "groups": [
+        {
+          "say": "Why does doing good feel so hard?",
+          "cap": "Why does doing good feel so hard?",
+          "gap": 1.5
+        },
+        {
+          "say": "Forty-one percent of Americans who didn't donate said they couldn't afford to.",
+          "cap": "41% of Americans who didn't donate said they couldn't afford to.",
+          "gap": 1.2
+        },
+        {
+          "say": "And almost half of adults say pressure to give puts them off.",
+          "cap": "And almost half of adults say pressure to give puts them off.",
+          "gap": 1.2
+        },
+        {
+          "say": "What if kindness could grow differently?",
+          "cap": "What if kindness could grow differently?",
+          "gap": 0.8
+        }
+      ],
+      "speed": 0.95
+    },
+    {
+      "id": "home",
+      "groups": [
+        {
+          "say": "Meet Hug shire.",
+          "cap": "Meet Hugshire.",
+          "gap": 0.6
+        },
+        {
+          "say": "A cozy little world where your savings can help real causes grow. And where helping means more than just giving money.",
+          "cap": "A cozy little world where your savings can help real causes grow. And where helping means more than just giving money.",
+          "gap": 0.6
+        }
+      ],
+      "speed": 0.97
+    },
+    {
+      "id": "deposit",
+      "groups": [
+        {
+          "say": "Plant your deposit.",
+          "cap": "Plant your deposit.",
+          "gap": 0.7
+        },
+        {
+          "say": "Through the Hug shire Vault and Ree-uh Finance, your funds can earn variable lending yield.",
+          "cap": "Through the Hugshire Vault and RHEA Finance, your funds can earn variable lending yield.",
+          "gap": 0.8
+        },
+        {
+          "say": "That yield grows as fruit on your Heart Tree.",
+          "cap": "That yield grows as fruit on your Heart Tree.",
+          "gap": 0.7
+        },
+        {
+          "say": "Harvest it, choose a cause, and turn your earnings into kindness.",
+          "cap": "Harvest it, choose a cause, and turn your earnings into kindness.",
+          "gap": 0.6
+        }
+      ],
+      "speed": 1
+    },
+    {
+      "id": "map",
+      "groups": [
+        {
+          "say": "Explore a world of causes.",
+          "cap": "Explore a world of causes.",
+          "gap": 0.6
+        },
+        {
+          "say": "Visit different towns, discover their stories, and find more communities to support.",
+          "cap": "Visit different towns, discover their stories, and find more communities to support.",
+          "gap": 0.6
+        }
+      ],
+      "speed": 1.03
+    },
+    {
+      "id": "build",
+      "groups": [
+        {
+          "say": "But Hug shire isn't just about giving.",
+          "cap": "But Hugshire isn't just about giving.",
+          "gap": 0.5
+        },
+        {
+          "say": "You can be part of the community!",
+          "cap": "You can be part of the community!",
+          "gap": 0.6
+        },
+        {
+          "say": "Play, contribute resources, and help build something together.",
+          "cap": "Play, contribute resources, and help build something together.",
+          "gap": 0.7
+        },
+        {
+          "say": "And watch your little town grow, one contribution at a time.",
+          "cap": "And watch your little town grow, one contribution at a time.",
+          "gap": 0.6
+        }
+      ],
+      "speed": 1.05
+    },
+    {
+      "id": "pool",
+      "groups": [
+        {
+          "say": "And there's another way to help.",
+          "cap": "And there's another way to help.",
+          "gap": 0.6
+        },
+        {
+          "say": "Choose to watch an ad, and eligible ad revenue can support the Community Heart Pool.",
+          "cap": "Choose to watch an ad, and eligible ad revenue can support the Community Heart Pool.",
+          "gap": 0.7
+        },
+        {
+          "say": "The shared charity budget is split equally among eligible supporters.",
+          "cap": "The shared charity budget is split equally among eligible supporters.",
+          "gap": 0.6
+        },
+        {
+          "say": "And everyone chooses which approved cause their share supports.",
+          "cap": "And everyone chooses which approved cause their share supports.",
+          "gap": 0.6
+        }
+      ],
+      "speed": 1
+    },
+    {
+      "id": "board",
+      "groups": [
+        {
+          "say": "And as we build our little world together, we stay connected to the communities we're helping.",
+          "cap": "And as we build our little world together, we stay connected to the communities we're helping.",
+          "gap": 0.8
+        },
+        {
+          "say": "Visit the Notice Board to follow their latest updates, see their stories, and discover the progress they're making beyond the game.",
+          "cap": "Visit the Notice Board to follow their latest updates, see their stories, and discover the progress they're making beyond the game.",
+          "gap": 0.6
+        }
+      ],
+      "speed": 0.94
+    },
+    {
+      "id": "withdraw",
+      "groups": [
+        {
+          "say": "And your deposit stays yours to request back when you need it, subject to lending risks and withdrawal conditions.",
+          "cap": "And your deposit stays yours to request back when you need it, subject to lending risks and withdrawal conditions.",
+          "gap": 0.6
+        }
+      ],
+      "speed": 0.95
+    },
+    {
+      "id": "tech",
+      "groups": [
+        {
+          "say": "Simple enough to feel like a game.",
+          "cap": "Simple enough to feel like a game.",
+          "gap": 0.5
+        },
+        {
+          "say": "And designed so every payout to a cause can be verified on the Near blockchain.",
+          "cap": "And designed so every payout to a cause can be verified on the NEAR blockchain.",
+          "gap": 0.6
+        }
+      ],
+      "speed": 1
+    },
+    {
+      "id": "outro",
+      "groups": [
+        {
+          "say": "More than giving.",
+          "cap": "More than giving.",
+          "gap": 0.6
+        },
+        {
+          "say": "A world we grow together.",
+          "cap": "A world we grow together.",
+          "gap": 0.8
+        },
+        {
+          "say": "Hug shire.",
+          "cap": "Hugshire.",
+          "gap": 0.4
+        },
+        {
+          "say": "Where kindness takes shape.",
+          "cap": "Where kindness takes shape.",
+          "gap": 0.2
+        }
+      ],
+      "speed": 0.92
+    }
+  ]
+}

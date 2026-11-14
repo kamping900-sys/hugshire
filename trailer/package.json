@@ -1,0 +1,10 @@
+{
+  "name": "hugshire-trailer",
+  "private": true,
+  "description": "Hugshire trailer production: footage capture, narration, music and the final edit. Separate from the app.",
+  "type": "commonjs",
+  "dependencies": {
+    "ffmpeg-static": "^5.2.0",
+    "kokoro-js": "^1.2.1"
+  }
+}

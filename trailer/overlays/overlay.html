@@ -1,0 +1,166 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Hugshire trailer overlays</title>
+<style>
+/* Brand tokens taken from the Hugshire app (globals.css, LandingScene, TownView) */
+@font-face { font-family: Manrope; font-weight: 200 800; src: url(../assets/fonts/manrope-latin.woff2) format("woff2"); }
+:root {
+  --cream: #FFF9F0; --cream-2: #FDF6EC; --brown: #8A6448; --ink: #3A2A22; --muted: #7B6A5C;
+  --orange: #F58A3C; --orange-deep: #E46F3E; --peach: #FFC48A; --line: #E4D3BE; --leaf: #3F9B5B; --butter: #FFF4D6;
+}
+html, body { margin: 0; width: 1920px; height: 1080px; background: transparent; overflow: hidden; font-family: Manrope, system-ui, sans-serif; color: var(--ink); }
+.o { display: none; position: absolute; inset: 0; }
+body[data-o="stat41"] #stat41, body[data-o="stat48"] #stat48, body[data-o="flowDeposit"] #flowDeposit,
+body[data-o="flowPool"] #flowPool, body[data-o="flowTech"] #flowTech, body[data-o="endcard"] #endcard,
+body[data-o="badge"] #badge, body[data-o="caption"] #caption, body[data-o="badgeSample"] #badgeSample, body[data-o="cap2"] #cap2, body[data-o="flowDeposit2"] #flowDeposit2 { display: block; }
+#badgeSample .pill { position: absolute; left: 28px; bottom: 14px; display: flex; align-items: center; gap: 8px; background: rgba(255,244,214,0.95); border: 2px solid #C9A24A; border-radius: 999px; padding: 5px 14px 5px 10px; font-size: 18px; font-weight: 800; color: #6B551A; box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
+#cap2 .cap { position: absolute; left: 50%; transform: translateX(-50%); width: 1500px; text-align: center; white-space: pre-line; font-size: 42px; font-weight: 800; line-height: 1.28; color: #FFF9F0; letter-spacing: 0.2px;
+  text-shadow: 0 0 2px rgba(30,20,14,0.95), 0 0 4px rgba(30,20,14,0.85), 0 2px 3px rgba(30,20,14,0.9), 0 4px 16px rgba(30,20,14,0.55); }
+#cap2[data-pos="low"] .cap { bottom: 62px; }
+#cap2[data-pos="high"] .cap { bottom: 214px; }
+
+/* ── statistics: big orange number, cream line, soft shade so it reads over the village ── */
+.stat-shade { position: absolute; left: 0; top: 0; bottom: 0; width: 1150px; background: linear-gradient(90deg, rgba(40,26,18,0.55), rgba(40,26,18,0.25) 65%, rgba(40,26,18,0)); animation: fadeIn 0.9s ease-out both, fadeOut 0.6s ease-in both var(--out); }
+.stat { position: absolute; left: 140px; top: 330px; width: 860px; animation: rise 0.9s cubic-bezier(.2,.8,.2,1) both 0.15s, fadeOut 0.6s ease-in both var(--out); }
+.stat .n { font-size: 190px; font-weight: 800; line-height: 0.95; color: var(--peach); letter-spacing: -4px; text-shadow: 0 6px 0 var(--brown), 0 14px 40px rgba(0,0,0,0.35); }
+.stat .t { margin-top: 26px; font-size: 46px; font-weight: 800; line-height: 1.22; color: var(--cream); text-shadow: 0 2px 2px rgba(40,28,22,0.8), 0 4px 18px rgba(0,0,0,0.45); text-wrap: balance; }
+.source { position: absolute; left: 140px; bottom: 70px; font-size: 22px; font-weight: 700; color: rgba(255,249,240,0.86); text-shadow: 0 1px 2px rgba(0,0,0,0.7); animation: fadeIn 0.8s both 0.6s, fadeOut 0.6s ease-in both var(--out); }
+
+/* ── flow strips: cream chips with brown outlines, appearing one by one ── */
+.strip { position: absolute; left: 50%; bottom: 132px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 14px; animation: fadeOut 0.5s ease-in both var(--out); }
+.strip .label { font-size: 22px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; color: var(--cream); background: rgba(58,42,34,0.82); border-radius: 999px; padding: 8px 20px; animation: fadeIn 0.5s both 0.1s; }
+.chips { display: flex; align-items: center; gap: 0; }
+.chip { display: flex; align-items: center; gap: 14px; background: var(--cream); border: 3px solid var(--brown); border-radius: 26px; padding: 14px 24px 14px 16px; box-shadow: 0 6px 0 rgba(138,100,72,0.55), 0 14px 30px rgba(0,0,0,0.25); animation: pop 0.55s cubic-bezier(.2,1.4,.4,1) both; }
+.chip .ic { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 36px; background: #FDE6D4; overflow: hidden; flex: none; }
+.chip .ic img { width: 100%; height: 100%; object-fit: cover; }
+.chip .nm { font-size: 27px; font-weight: 800; line-height: 1.1; white-space: nowrap; }
+.chip .sb { font-size: 18px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.arrow { width: 54px; height: 6px; margin: 0 8px; border-radius: 3px; background: repeating-linear-gradient(90deg, var(--cream) 0 10px, transparent 10px 18px); filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); position: relative; animation: fadeIn 0.4s both; }
+.arrow::after { content: ""; position: absolute; right: -6px; top: -8px; border-left: 14px solid var(--cream); border-top: 11px solid transparent; border-bottom: 11px solid transparent; }
+.chip.goal { background: var(--orange); border-color: var(--brown); }
+.chip.goal .nm { color: #fff; }
+.chip.goal .sb { color: #FFE9D6; }
+
+/* ── small disclosure pill ── */
+#badge .pill { position: absolute; left: 28px; bottom: 14px; display: flex; align-items: center; gap: 8px; background: rgba(255,244,214,0.95); border: 2px solid #C9A24A; border-radius: 999px; padding: 5px 14px 5px 10px; font-size: 18px; font-weight: 800; color: #6B551A; box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
+
+/* ── captions (burned-in version) ── */
+#caption .cap { position: absolute; left: 50%; bottom: 104px; transform: translateX(-50%); max-width: 1500px; text-align: center; white-space: pre-line; font-size: 40px; font-weight: 800; line-height: 1.3; color: #fff; background: rgba(40,28,22,0.72); border-radius: 18px; padding: 10px 26px; text-wrap: balance; }
+
+/* ── end card: the real logo, the wordmark dropping in like the site title, the tagline ── */
+.end-shade { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 46%, rgba(40,26,18,0.25), rgba(40,26,18,0.62) 75%); animation: fadeIn 1.2s ease-out both; }
+.end { position: absolute; left: 0; right: 0; top: 230px; display: flex; flex-direction: column; align-items: center; }
+.end .logo { width: 236px; height: 236px; border-radius: 56px; border: 6px solid var(--cream); box-shadow: 0 12px 40px rgba(0,0,0,0.4); animation: pop 0.8s cubic-bezier(.2,1.4,.4,1) both 0.1s, floaty 3.2s ease-in-out infinite 1s; }
+.end h1 { margin: 34px 0 0; font-size: 168px; font-weight: 800; letter-spacing: -3px; line-height: 1; color: var(--cream); text-shadow: 0 8px 0 var(--brown), 0 18px 50px rgba(0,0,0,0.4); }
+.end h1 span { display: inline-block; animation: drop 0.7s cubic-bezier(.2,1.5,.4,1) both; }
+.end p { margin: 34px 0 0; font-size: 56px; font-weight: 800; color: var(--peach); text-shadow: 0 3px 0 rgba(138,100,72,0.9), 0 8px 24px rgba(0,0,0,0.45); animation: rise 0.9s cubic-bezier(.2,.8,.2,1) both 1.5s; }
+
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes fadeOut { from { opacity: 1 } to { opacity: 0 } }
+@keyframes rise { from { opacity: 0; transform: translateY(34px) } to { opacity: 1; transform: none } }
+@keyframes pop { 0% { opacity: 0; transform: scale(0.6) } 100% { opacity: 1; transform: scale(1) } }
+@keyframes drop { 0% { opacity: 0; transform: translateY(-90px) rotate(-8deg) } 100% { opacity: 1; transform: none } }
+@keyframes floaty { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-10px) } }
+</style>
+</head>
+<body>
+<div class="o" id="stat41" style="--out: 5.6s">
+  <div class="stat-shade"></div>
+  <div class="stat"><div class="n">41%</div><div class="t">of U.S. non-donors said they couldn't afford to give.</div></div>
+  <div class="source">Source: YouGov, Oct 26, 2026 · survey of 1,291 U.S. adults, Aug 20–21, 2026</div>
+</div>
+<div class="o" id="stat48" style="--out: 4.6s">
+  <div class="stat-shade" style="animation: fadeOut 0.6s ease-in both var(--out)"></div>
+  <div class="stat"><div class="n">48%</div><div class="t">of U.S. adults said feeling pressured would put them off donating.</div></div>
+  <div class="source" style="animation: fadeOut 0.6s ease-in both var(--out)">Source: YouGov, Oct 26, 2026 · survey of 1,291 U.S. adults, Aug 20–21, 2026</div>
+</div>
+
+<div class="o" id="flowDeposit" style="--out: 5.0s">
+  <div class="strip">
+    <div class="label">How it's designed to grow</div>
+    <div class="chips">
+      <div class="chip" style="animation-delay:.2s"><div class="ic">💳</div><div><div class="nm">Your deposit</div><div class="sb">stays yours</div></div></div>
+      <div class="arrow" style="animation-delay:.6s"></div>
+      <div class="chip" style="animation-delay:.8s"><div class="ic"><img src="../assets/logo.png"></div><div><div class="nm">Hugshire Vault</div><div class="sb">a contract on NEAR</div></div></div>
+      <div class="arrow" style="animation-delay:1.2s"></div>
+      <div class="chip" style="animation-delay:1.4s"><div class="ic"><img src="../assets/rhea.svg"></div><div><div class="nm">RHEA lending</div><div class="sb">variable interest</div></div></div>
+      <div class="arrow" style="animation-delay:1.8s"></div>
+      <div class="chip" style="animation-delay:2.0s"><div class="ic"><img src="../assets/fruit_red_1.png" style="object-fit:contain"></div><div><div class="nm">Heart Fruit</div><div class="sb">the interest</div></div></div>
+      <div class="arrow" style="animation-delay:2.4s"></div>
+      <div class="chip goal" style="animation-delay:2.6s"><div class="ic">🏡</div><div><div class="nm">Causes</div><div class="sb">you choose</div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="o" id="flowPool" style="--out: 5.6s">
+  <div class="strip">
+    <div class="label">Community Heart Pool · demo</div>
+    <div class="chips">
+      <div class="chip" style="animation-delay:.2s"><div class="ic">📺</div><div><div class="nm">Optional ads</div><div class="sb">your choice to watch</div></div></div>
+      <div class="arrow" style="animation-delay:.6s"></div>
+      <div class="chip" style="animation-delay:.8s"><div class="ic">🧺</div><div><div class="nm">Community Pool</div><div class="sb">revenue actually received</div></div></div>
+      <div class="arrow" style="animation-delay:1.2s"></div>
+      <div class="chip" style="animation-delay:1.4s"><div class="ic"><img src="../assets/fruit_gold_1.png" style="object-fit:contain"></div><div><div class="nm">Equal shares</div><div class="sb">for eligible supporters</div></div></div>
+      <div class="arrow" style="animation-delay:1.8s"></div>
+      <div class="chip goal" style="animation-delay:2.0s"><div class="ic">🏡</div><div><div class="nm">Causes</div><div class="sb">each supporter picks</div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="o" id="flowTech" style="--out: 7.9s">
+  <div class="strip">
+    <div class="label">Intended live route · integrations in development</div>
+    <div class="chips">
+      <div class="chip" style="animation-delay:.2s"><div class="ic"><img src="../assets/coinbase.svg"></div><div><div class="nm">Coinbase Onramp</div><div class="sb">card → USDC</div></div></div>
+      <div class="arrow" style="animation-delay:.9s"></div>
+      <div class="chip" style="animation-delay:1.2s"><div class="ic"><img src="../assets/near.svg"></div><div><div class="nm">NEAR Intents</div><div class="sb">Base → NEAR</div></div></div>
+      <div class="arrow" style="animation-delay:1.9s"></div>
+      <div class="chip" style="animation-delay:2.2s"><div class="ic"><img src="../assets/logo.png"></div><div><div class="nm">Hugshire Vault</div><div class="sb">principal stays yours</div></div></div>
+      <div class="arrow" style="animation-delay:2.9s"></div>
+      <div class="chip" style="animation-delay:3.2s"><div class="ic"><img src="../assets/rhea.svg"></div><div><div class="nm">RHEA Finance</div><div class="sb">lending</div></div></div>
+      <div class="arrow" style="animation-delay:3.9s"></div>
+      <div class="chip goal" style="animation-delay:4.4s"><div class="ic">🏛️</div><div><div class="nm">Causes &amp; Treasury</div><div class="sb">payouts checkable onchain</div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="o" id="badge"><div class="pill">🧪 Demo environment · Financial transactions simulated</div></div>
+<div class="o" id="caption"><div class="cap" id="capText"></div></div>
+<div class="o" id="cap2"><div class="cap" id="cap2Text"></div></div>
+<div class="o" id="badgeSample"><div class="pill">🏡 Sample organisation posts · demo content</div></div>
+<div class="o" id="flowDeposit2" style="--out: 3.1s">
+  <div class="strip">
+    <div class="chips">
+      <div class="chip" style="animation-delay:.05s"><div class="ic">💳</div><div><div class="nm">Deposit</div><div class="sb">stays yours</div></div></div>
+      <div class="arrow" style="animation-delay:.25s"></div>
+      <div class="chip" style="animation-delay:.35s"><div class="ic"><img src="../assets/logo.png"></div><div><div class="nm">Hugshire Vault</div><div class="sb">on NEAR</div></div></div>
+      <div class="arrow" style="animation-delay:.55s"></div>
+      <div class="chip" style="animation-delay:.65s"><div class="ic"><img src="../assets/rhea.svg"></div><div><div class="nm">RHEA lending</div><div class="sb">variable yield</div></div></div>
+      <div class="arrow" style="animation-delay:.85s"></div>
+      <div class="chip" style="animation-delay:.95s"><div class="ic"><img src="../assets/fruit_red_1.png" style="object-fit:contain"></div><div><div class="nm">Heart Fruit</div><div class="sb">the yield</div></div></div>
+      <div class="arrow" style="animation-delay:1.15s"></div>
+      <div class="chip goal" style="animation-delay:1.25s"><div class="ic">🏡</div><div><div class="nm">Causes</div><div class="sb">you choose</div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="o" id="endcard">
+  <div class="end-shade"></div>
+  <div class="end">
+    <img class="logo" src="../assets/logo.png">
+    <h1 id="word"></h1>
+    <p>Where kindness takes shape.</p>
+  </div>
+</div>
+
+<script>
+const q = new URLSearchParams(location.search);
+document.body.dataset.o = q.get("o") || "stat41";
+document.getElementById("word").innerHTML = "Hugshire".split("").map((c, i) => `<span style="animation-delay:${0.45 + i * 0.07}s">${c}</span>`).join("");
+if (q.get("text")) { document.getElementById("capText").textContent = q.get("text"); document.getElementById("cap2Text").textContent = q.get("text"); }
+document.getElementById("cap2").dataset.pos = q.get("pos") || "low";
+</script>
+</body>
+</html>

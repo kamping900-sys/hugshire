@@ -1,6 +1,22 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "hugshire", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev"], "port": 3200 }
+    {
+      "name": "hugshire",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "port": 3200
+    },
+    {
+      "name": "trailer",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "trailer/scripts/serve.cjs"
+      ],
+      "port": 3300
+    }
   ]
 }

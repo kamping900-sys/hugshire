@@ -1,0 +1,43 @@
+{
+  "note": "Lead = silence before the first line of a scene, tail = room after its last line (music, gameplay, emotional holds).",
+  "open": {
+    "lead": 0.8,
+    "tail": 0.7
+  },
+  "home": {
+    "lead": 0.8,
+    "tail": 0.9
+  },
+  "deposit": {
+    "lead": 0.4,
+    "tail": 1
+  },
+  "map": {
+    "lead": 0.4,
+    "tail": 2.9
+  },
+  "build": {
+    "lead": 0.3,
+    "tail": 3.3
+  },
+  "pool": {
+    "lead": 0.4,
+    "tail": 1.9
+  },
+  "board": {
+    "lead": 0.6,
+    "tail": 2.5
+  },
+  "withdraw": {
+    "lead": 0.4,
+    "tail": 0.8
+  },
+  "tech": {
+    "lead": 0.3,
+    "tail": 0.7
+  },
+  "outro": {
+    "lead": 1.2,
+    "tail": 5
+  }
+}

@@ -1,0 +1,270 @@
+{
+  "voice": "af_heart",
+  "note": "Each line is generated on its own so pauses and pacing can be placed exactly. 'gap' is the silence after the line, in seconds. 'speed' is Kokoro's speaking rate.",
+  "scenes": [
+    {
+      "id": "s1",
+      "title": "The problem",
+      "start": 0,
+      "end": 22,
+      "lead": 2.2,
+      "speed": 0.95,
+      "lines": [
+        {
+          "t": "What if helping others didn't always mean giving your money away?",
+          "gap": 1.2
+        },
+        {
+          "t": "In the United States, forty-one percent of people who hadn't donated said they couldn't afford to.",
+          "gap": 0.8
+        },
+        {
+          "t": "And nearly half of adults say feeling pressured discourages them from giving.",
+          "gap": 1
+        },
+        {
+          "t": "But good causes still need support.",
+          "gap": 0.8
+        },
+        {
+          "t": "What if kindness could grow a little differently?",
+          "gap": 0.6
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Welcome to Hugshire",
+      "start": 22,
+      "end": 37,
+      "lead": 1.6,
+      "speed": 0.95,
+      "lines": [
+        {
+          "t": "Welcome to Hugshire.",
+          "gap": 0.9
+        },
+        {
+          "t": "A little world, with a lot of heart.",
+          "gap": 0.8
+        },
+        {
+          "t": "Where every supporter has a place, and every act of kindness helps a community grow.",
+          "gap": 0.5
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Plant a deposit, grow kindness",
+      "start": 37,
+      "end": 65,
+      "lead": 0.8,
+      "speed": 0.97,
+      "lines": [
+        {
+          "t": "Your journey begins with a deposit.",
+          "gap": 1.4
+        },
+        {
+          "t": "Behind the scenes, your deposit is designed to be lent through RHEA Finance on NEAR, earning variable interest.",
+          "gap": 1
+        },
+        {
+          "t": "As that yield adds up, heart-shaped fruits grow on your very own Heart Tree.",
+          "gap": 1
+        },
+        {
+          "t": "Harvest them, choose a cause, and deliver your support.",
+          "gap": 0.8
+        },
+        {
+          "t": "Or let your little helper deliver automatically, with your permission.",
+          "gap": 0.5
+        }
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Explore a world of causes",
+      "start": 65,
+      "end": 84,
+      "lead": 1,
+      "speed": 1,
+      "lines": [
+        {
+          "t": "But there's a whole world beyond your tree.",
+          "gap": 1
+        },
+        {
+          "t": "Follow the roads, explore new towns, discover different causes, and meet the animals building them.",
+          "gap": 1
+        },
+        {
+          "t": "Every town represents a community worth supporting.",
+          "gap": 0.5
+        }
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "Play and build together",
+      "start": 84,
+      "end": 108,
+      "lead": 0.6,
+      "speed": 1.02,
+      "lines": [
+        {
+          "t": "And here's where the fun begins!",
+          "gap": 0.7
+        },
+        {
+          "t": "Find an unfinished building.",
+          "gap": 0.5
+        },
+        {
+          "t": "Pick up an axe.",
+          "gap": 0.6
+        },
+        {
+          "t": "Time your chop...",
+          "gap": 0.5
+        },
+        {
+          "t": "Perfect!",
+          "gap": 1.2
+        },
+        {
+          "t": "Gather wood, help finish buildings, and watch your town come to life.",
+          "gap": 0.8
+        },
+        {
+          "t": "And while you're away, your helper can keep working too.",
+          "gap": 0.7
+        },
+        {
+          "t": "Little by little, everyone builds something together.",
+          "gap": 0.5
+        }
+      ]
+    },
+    {
+      "id": "s6",
+      "title": "Real stories behind every town",
+      "start": 108,
+      "end": 126,
+      "lead": 1.4,
+      "speed": 0.92,
+      "lines": [
+        {
+          "t": "Every town has a story.",
+          "gap": 1
+        },
+        {
+          "t": "Visit the Notice Board to discover updates, photos, and progress shared by the organizations behind each cause.",
+          "gap": 1.2
+        },
+        {
+          "t": "Because the world beyond the game matters most.",
+          "gap": 0.5
+        }
+      ]
+    },
+    {
+      "id": "s7",
+      "title": "Community Heart Pool",
+      "start": 126,
+      "end": 147,
+      "lead": 0.8,
+      "speed": 0.97,
+      "lines": [
+        {
+          "t": "There's another way to help, too.",
+          "gap": 0.8
+        },
+        {
+          "t": "Choose to watch an ad, and part of the revenue Hugshire receives can support the Community Heart Pool.",
+          "gap": 0.9
+        },
+        {
+          "t": "Eligible supporters share the charitable budget equally.",
+          "gap": 0.6
+        },
+        {
+          "t": "And each decides which approved cause it supports.",
+          "gap": 0.8
+        },
+        {
+          "t": "A little community effort, directed by the community itself.",
+          "gap": 0.4
+        }
+      ]
+    },
+    {
+      "id": "s8",
+      "title": "Your money, your choice",
+      "start": 147,
+      "end": 162,
+      "lead": 0.8,
+      "speed": 0.93,
+      "lines": [
+        {
+          "t": "And your deposit?",
+          "gap": 0.8
+        },
+        {
+          "t": "You can request your remaining funds back whenever you need them, subject to lending risks and withdrawal conditions.",
+          "gap": 0.9
+        },
+        {
+          "t": "Supporting a cause doesn't have to mean permanently giving away your savings.",
+          "gap": 0.4
+        }
+      ]
+    },
+    {
+      "id": "s9",
+      "title": "Simple experience, transparent technology",
+      "start": 162,
+      "end": 172.5,
+      "lead": 0.5,
+      "speed": 0.98,
+      "lines": [
+        {
+          "t": "Designed to feel as welcoming as any game.",
+          "gap": 0.6
+        },
+        {
+          "t": "Underneath, NEAR Intents carries your dollars onto NEAR, the Hugshire Vault lends them through RHEA, and every payout to a cause can be checked onchain.",
+          "gap": 0.3
+        }
+      ]
+    },
+    {
+      "id": "s10",
+      "title": "Where kindness takes shape",
+      "start": 172.5,
+      "end": 180,
+      "lead": 0.4,
+      "speed": 0.9,
+      "lines": [
+        {
+          "t": "A little world.",
+          "gap": 0.5
+        },
+        {
+          "t": "A community, growing together.",
+          "gap": 0.7
+        },
+        {
+          "t": "Hugshire.",
+          "gap": 0.5
+        },
+        {
+          "t": "Where kindness takes shape.",
+          "gap": 0.2
+        }
+      ]
+    }
+  ]
+}

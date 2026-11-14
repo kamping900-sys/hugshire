@@ -1,0 +1,59 @@
+{
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "duration": 180,
+  "note": "Scene boundaries in seconds, fitted to the measured narration (build/voice/lines.json).",
+  "scenes": [
+    {
+      "id": "s1",
+      "start": 0,
+      "end": 24.5
+    },
+    {
+      "id": "s2",
+      "start": 24.5,
+      "end": 38.5
+    },
+    {
+      "id": "s3",
+      "start": 38.5,
+      "end": 64.5
+    },
+    {
+      "id": "s4",
+      "start": 64.5,
+      "end": 79.5
+    },
+    {
+      "id": "s5",
+      "start": 79.5,
+      "end": 103.5
+    },
+    {
+      "id": "s6",
+      "start": 103.5,
+      "end": 119.5
+    },
+    {
+      "id": "s7",
+      "start": 119.5,
+      "end": 141.5
+    },
+    {
+      "id": "s8",
+      "start": 141.5,
+      "end": 157
+    },
+    {
+      "id": "s9",
+      "start": 157,
+      "end": 169.5
+    },
+    {
+      "id": "s10",
+      "start": 169.5,
+      "end": 180
+    }
+  ]
+}

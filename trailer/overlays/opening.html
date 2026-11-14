@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Hugshire trailer opening</title>
+<style>
+/* Opening problem statement: typography-led, Hugshire brand (Manrope, cream/peach, orange, brown). 17.6 s. */
+@font-face { font-family: Manrope; font-weight: 200 800; src: url(../assets/fonts/manrope-latin.woff2) format("woff2"); }
+:root { --cream: #FFF9F0; --peach: #FFE2CB; --peach-2: #FFD0AE; --orange: #F58A3C; --orange-deep: #E46F3E; --brown: #8A6448; --ink: #3A2A22; --muted: #7B6A5C; --rose: #F4A6A0; --leaf: #8FBF7A; }
+html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; font-family: Manrope, system-ui, sans-serif; color: var(--ink); }
+body { background: radial-gradient(ellipse 80% 70% at 30% 25%, #FFF8EE 0%, rgba(255,248,238,0) 60%), radial-gradient(ellipse 70% 60% at 80% 80%, #FFD9BE 0%, rgba(255,217,190,0) 65%), linear-gradient(160deg, #FFF4E6 0%, #FFE6D2 55%, #FFD7BC 100%); }
+.grain { position: absolute; inset: 0; opacity: 0.07; mix-blend-mode: multiply; pointer-events: none; }
+.blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.55; animation: drift 14s ease-in-out infinite alternate; }
+.waves { position: absolute; left: -10%; right: -10%; bottom: -30px; height: 260px; }
+.waves path { animation: sway 9s ease-in-out infinite alternate; }
+.waves path:nth-child(2) { animation-duration: 12s; animation-direction: alternate-reverse; }
+.heart, .petal, .leaf { position: absolute; will-change: transform; }
+.heart { animation: rise linear infinite; }
+.petal, .leaf { animation: fall linear infinite; }
+
+/* scenes */
+.scene { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; opacity: 0; }
+h1 { margin: 0; font-size: 124px; font-weight: 800; line-height: 1.04; letter-spacing: -3px; color: var(--ink); text-shadow: 0 4px 0 rgba(255,255,255,0.65); text-wrap: balance; }
+h1 .w { display: inline-block; opacity: 0; transform: translateY(40px); }
+.num { font-size: 300px; font-weight: 800; line-height: 0.9; letter-spacing: -8px; color: var(--orange); text-shadow: 0 10px 0 var(--brown), 0 24px 60px rgba(138,100,72,0.35); font-variant-numeric: tabular-nums; position: relative; }
+.num.land { animation: land 0.55s cubic-bezier(.2,1.6,.4,1); }
+.ring { position: absolute; left: 50%; top: 46%; width: 380px; height: 380px; margin: -190px 0 0 -190px; border-radius: 50%; border: 6px solid rgba(245,138,60,0.45); opacity: 0; transform: scale(0.6); }
+.ring.go { animation: ring 0.9s ease-out forwards; }
+.line { margin-top: 44px; font-size: 54px; font-weight: 800; line-height: 1.22; max-width: 1300px; color: var(--ink); opacity: 0; transform: translateY(26px); text-wrap: balance; }
+.src { position: absolute; left: 0; right: 0; bottom: 18px; font-size: 21px; font-weight: 700; color: var(--muted); letter-spacing: 0.4px; opacity: 0; }
+.q h1 { color: var(--ink); }
+.q .accent { color: var(--orange-deep); }
+.sprout { width: 120px; height: 120px; margin-bottom: 26px; opacity: 0; transform: scale(0.4) translateY(30px); }
+.wash { position: absolute; inset: 0; background: #F5D3B4; opacity: 0; }
+
+@keyframes drift { from { transform: translate(0,0) scale(1) } to { transform: translate(60px,-40px) scale(1.12) } }
+@keyframes sway { from { transform: translateX(0) } to { transform: translateX(-90px) } }
+@keyframes rise { from { transform: translateY(0) rotate(var(--r0)) } to { transform: translateY(-1350px) rotate(var(--r1)) } }
+@keyframes fall { from { transform: translate(0,0) rotate(0deg) } to { transform: translate(var(--dx), 1350px) rotate(var(--rot)) } }
+@keyframes inUp { from { opacity: 0; transform: translateY(40px) } to { opacity: 1; transform: none } }
+@keyframes out { from { opacity: 1 } to { opacity: 0 } }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes land { 0% { transform: scale(1.12) } 100% { transform: scale(1) } }
+@keyframes ring { 0% { opacity: 0.9; transform: scale(0.6) } 100% { opacity: 0; transform: scale(1.5) } }
+@keyframes sprout { 0% { opacity: 0; transform: scale(0.4) translateY(30px) } 70% { opacity: 1; transform: scale(1.08) translateY(0) } 100% { opacity: 1; transform: scale(1) } }
+</style>
+</head>
+<body>
+<svg class="grain" width="1920" height="1080"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0.45  0 0 0 0 0.32  0 0 0 0 0.22  0 0 0 0.9 0"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>
+<div class="blob" style="left:-120px;top:-80px;width:620px;height:520px;background:#FFE9D2"></div>
+<div class="blob" style="right:-160px;top:180px;width:680px;height:600px;background:#FFC9A8;animation-delay:-5s"></div>
+<div class="blob" style="left:620px;bottom:-260px;width:760px;height:560px;background:#FFE0C2;animation-delay:-9s"></div>
+<div id="fx"></div>
+<svg class="waves" viewBox="0 0 2200 260" preserveAspectRatio="none">
+  <path d="M0 150 C 220 90 440 210 660 150 S 1100 90 1320 150 S 1760 210 1980 150 S 2200 120 2200 120 L2200 260 L0 260 Z" fill="#FFCFAE" opacity="0.55"/>
+  <path d="M0 190 C 260 140 520 240 780 190 S 1300 140 1560 190 S 2080 240 2200 200 L2200 260 L0 260 Z" fill="#F9B98F" opacity="0.38"/>
+</svg>
+
+<div class="scene" id="s1"><h1 id="h1"></h1></div>
+
+<div class="scene" id="s2">
+  <div class="ring" id="r2"></div>
+  <div class="num" id="n2">0%</div>
+  <div class="line" id="l2">of U.S. non-donors said they couldn't afford to give.</div>
+</div>
+<div class="scene" id="s3">
+  <div class="ring" id="r3"></div>
+  <div class="num" id="n3">0%</div>
+  <div class="line" id="l3">of U.S. adults say feeling pressured to give would put them off.</div>
+</div>
+<div class="src" id="src">Source: YouGov · U.S. survey of 1,291 adults · October 2026</div>
+
+<div class="scene q" id="s4">
+  <svg class="sprout" id="sp" viewBox="0 0 120 120"><path d="M60 112 C 60 90 60 76 60 60" stroke="#6E9E58" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M60 72 C 40 70 26 56 26 38 C 46 38 60 52 60 72 Z" fill="#8FBF7A"/><path d="M60 64 C 78 60 92 44 92 26 C 72 28 60 44 60 64 Z" fill="#A8D08E"/><path d="M60 48s-12-7.5-16-14.5c-3-5.4-.2-11.6 5.9-12.2 3.4-.3 5.8 1.5 7 3.4 1.2-1.9 3.6-3.7 7-3.4 6.1.6 8.9 6.8 5.9 12.2C72 40.5 60 48 60 48z" fill="#F58A3C"/></svg>
+  <h1>What if kindness could<br><span class="accent">grow differently?</span></h1>
+</div>
+<div class="wash" id="wash"></div>
+
+<script>
+// timings (s) — matched to the narration
+const T = { h1: 0.35, h1Out: 4.0, s2: 4.25, count2: 4.7, s2Out: 9.75, s3: 9.95, count3: 10.35, s3Out: 14.35, s4: 14.55, wash: 16.9 };
+const COUNT = 1.0;
+const H1 = "Why does doing good feel so hard?";
+document.getElementById("h1").innerHTML = H1.split(" ").map((w, i) => `<span class="w" data-i="${i}">${w}</span>`).join(" ");
+
+// decorative hearts, petals and leaves (seeded, deterministic)
+let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+const fx = document.getElementById("fx");
+const heartSvg = (c, o) => `<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 21s-7-4.4-9.5-8.6C.7 9.2 2.4 5.5 6 5.1c2-.2 3.4.9 4.1 2 .7-1.1 2.1-2.2 4.1-2 3.6.4 5.3 4.1 3.5 7.3C19 16.6 12 21 12 21z" fill="${c}" opacity="${o}"/></svg>`;
+const HC = ["#F58A3C", "#F4A6A0", "#FFB48A", "#E46F3E", "#F7C59F"];
+for (let i = 0; i < 16; i++) {
+  const s = 26 + rnd() * 70, el = document.createElement("div");
+  el.className = "heart";
+  el.style.cssText = `left:${rnd() * 1880}px;top:${1100 + rnd() * 200}px;width:${s}px;height:${s}px;--r0:${-20 + rnd() * 40}deg;--r1:${-40 + rnd() * 80}deg;animation-duration:${16 + rnd() * 14}s;animation-delay:${-rnd() * 26}s;filter:blur(${s > 70 ? 2 : 0}px)`;
+  el.innerHTML = heartSvg(HC[i % HC.length], 0.35 + rnd() * 0.4);
+  fx.appendChild(el);
+}
+for (let i = 0; i < 18; i++) {
+  const el = document.createElement("div"), leaf = i % 3 === 0;
+  el.className = leaf ? "leaf" : "petal";
+  const w = leaf ? 26 + rnd() * 18 : 14 + rnd() * 10, h = leaf ? w * 0.5 : w * 0.7;
+  el.style.cssText = `left:${rnd() * 1920}px;top:${-120 - rnd() * 200}px;width:${w}px;height:${h}px;border-radius:${leaf ? "50% 0" : "60% 40% 60% 40%"};background:${leaf ? "#9CC786" : ["#F6B7B0", "#FFD1B5", "#F4A6A0"][i % 3]};opacity:${0.45 + rnd() * 0.35};--dx:${-200 + rnd() * 400}px;--rot:${360 + rnd() * 540}deg;animation-duration:${14 + rnd() * 12}s;animation-delay:${-rnd() * 24}s`;
+  fx.appendChild(el);
+}
+
+const $ = (id) => document.getElementById(id);
+const eo = (u) => 1 - Math.pow(1 - Math.min(1, Math.max(0, u)), 3);
+const t0 = performance.now();
+let landed2 = false, landed3 = false;
+function vis(el, a, b, fin = 0.45, fout = 0.45, t) {
+  const o = t < a ? 0 : t < a + fin ? (t - a) / fin : t < b - fout ? 1 : t < b ? (b - t) / fout : 0;
+  el.style.opacity = o;
+}
+function frame() {
+  const t = (performance.now() - t0) / 1000;
+  vis($("s1"), T.h1 - 0.01, T.h1Out, 0.01, 0.4, t);
+  document.querySelectorAll("#h1 .w").forEach((w) => { const u = eo((t - T.h1 - +w.dataset.i * 0.09) / 0.6); w.style.opacity = u; w.style.transform = `translateY(${(1 - u) * 40}px)`; });
+  vis($("s2"), T.s2, T.s2Out, 0.4, 0.4, t);
+  vis($("s3"), T.s3, T.s3Out, 0.4, 0.4, t);
+  vis($("src"), T.s2 + 0.6, T.s3Out, 0.5, 0.4, t);
+  const c2 = eo((t - T.count2) / COUNT), c3 = eo((t - T.count3) / COUNT);
+  $("n2").textContent = Math.round(41 * c2) + "%";
+  $("n3").textContent = Math.round(48 * c3) + "%";
+  if (!landed2 && t >= T.count2 + COUNT) { landed2 = true; $("n2").classList.add("land"); $("r2").classList.add("go"); }
+  if (!landed3 && t >= T.count3 + COUNT) { landed3 = true; $("n3").classList.add("land"); $("r3").classList.add("go"); }
+  for (const [id, at] of [["l2", T.count2 + 0.55], ["l3", T.count3 + 0.55]]) { const u = eo((t - at) / 0.6); $(id).style.opacity = u; $(id).style.transform = `translateY(${(1 - u) * 26}px)`; }
+  vis($("s4"), T.s4, 99, 0.5, 0.4, t);
+  if (t >= T.s4 + 0.15 && !$("sp").style.animation) $("sp").style.animation = "sprout 0.9s cubic-bezier(.2,1.3,.4,1) forwards";
+  vis($("wash"), T.wash, 99, 0.7, 0.4, t);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

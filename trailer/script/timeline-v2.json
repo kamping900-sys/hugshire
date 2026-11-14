@@ -1,0 +1,56 @@
+{
+  "fps": 30,
+  "duration": 136.1,
+  "scenes": [
+    {
+      "id": "open",
+      "start": 0,
+      "end": 17.57
+    },
+    {
+      "id": "home",
+      "start": 17.57,
+      "end": 28.28
+    },
+    {
+      "id": "deposit",
+      "start": 28.28,
+      "end": 44.55
+    },
+    {
+      "id": "map",
+      "start": 44.55,
+      "end": 55.04
+    },
+    {
+      "id": "build",
+      "start": 55.04,
+      "end": 71.35
+    },
+    {
+      "id": "pool",
+      "start": 71.35,
+      "end": 90.26
+    },
+    {
+      "id": "board",
+      "start": 90.26,
+      "end": 106.57
+    },
+    {
+      "id": "withdraw",
+      "start": 106.57,
+      "end": 114.47
+    },
+    {
+      "id": "tech",
+      "start": 114.47,
+      "end": 122.6
+    },
+    {
+      "id": "outro",
+      "start": 122.6,
+      "end": 136.1
+    }
+  ]
+}
