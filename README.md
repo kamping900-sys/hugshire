@@ -12,7 +12,6 @@ The deposit stays attributable to the supporter and can be requested back at any
 | **Watch the trailer** | https://x.com/hugshire_fun/status/2121642297746198702 |
 | **Source code** | https://github.com/kamping900-sys/hugshire |
 | **Onchain proof** | [NEAR testnet transactions](#onchain-proof-near-testnet) |
-| **Hackathon tracks** | Unstoppable DeFi · Social Money · Games with real economies |
 
 ![The Hugshire homepage](docs/images/homepage.jpg)
 
@@ -114,6 +113,15 @@ flowchart LR
 **Which parts run where:**
 - **Running on NEAR testnet today:** the Vault deposit, supply to lending, donation to a cause's wallet, withdrawal to the supporter's wallet, and treasury payouts. These use test USDC and a RHEA-compatible lending contract.
 - **Integrated, awaiting mainnet:** Coinbase Onramp/Offramp and NEAR Intents. Their adapters are implemented and verified read-only against the live services; they run in mainnet mode once the accounts and approvals are in place.
+
+### Why Coinbase Onramp and Offramp
+
+Getting money in and out costs supporters as little as possible.
+
+- **Zero-fee USDC:** Coinbase offers [zero-fee onramping and offramping for USDC](https://www.coinbase.com/developer-platform/discover/launches/zero-fee-usdc) (buying or selling USDC with a card or bank account) to qualifying apps, until further notice; availability varies by region. Hugshire is built for this route and will apply for it at launch.
+- **USDC from start to finish:** a deposit stays in USDC from checkout to the Vault, so there's no token swap or currency spread inside the route. The one other step, NEAR Intents 1Click from Base to NEAR, costs 0.01% for stablecoin pairs with a partner key.
+- **A familiar checkout:** card or Apple Pay, with Coinbase handling identity checks and payment compliance.
+- **The supporter's own wallet:** USDC is delivered to the supporter's wallet, and withdrawals cash out to their bank through the Offramp.
 
 <p align="center"><img src="docs/images/heart-tree-onchain.jpg" alt="Heart Tree with the onchain NEAR testnet view" width="820"></p>
 

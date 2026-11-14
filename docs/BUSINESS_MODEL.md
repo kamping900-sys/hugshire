@@ -15,7 +15,7 @@ This document describes the commercial model, what is **configured in the code t
 | Advertising revenue | A **revenue split is built**: `budget = floor(received revenue × charity share bps ÷ 10,000)` goes to the Community Heart Pool, and the rest is not allocated to charity | The charity share is **to be determined and published**. The non-charity part funds operations |
 | Charity share setting | `poolCharityBps` (admin setting). **Not set yet (0)**, so finalising a pool month is refused until it is published | A published, stable percentage |
 | Ad revenue | **Simulated in the demo** ($0.01 per simulated view, labelled). Production ads are switched off (`adsProductionEnabled=false`) | Live ad partnerships. Only revenue the provider has actually paid is counted |
-| Provider fees | Coinbase and NEAR Intents fees are passed through, shown to the user and recorded per deposit and withdrawal | Unchanged |
+| Provider fees | Coinbase and NEAR Intents fees are passed through, shown to the user and recorded per deposit and withdrawal | Keep them near zero: apply for Coinbase's [zero-fee USDC onramp and offramp](https://www.coinbase.com/developer-platform/discover/launches/zero-fee-usdc) (qualifying apps, until further notice, region-dependent). Use a NEAR Intents partner key (0.01% for stablecoin pairs, versus 0.25% without a key) |
 
 ---
 
