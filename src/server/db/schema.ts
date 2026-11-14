@@ -830,3 +830,26 @@ export const orgInquiries = pgTable("org_inquiries", {
   ip: text("ip"),
   createdAt: createdAt(),
 });
+
+/**
+ * NEAR testnet transactions behind each game action (demo onchain mode, CHAIN_MODE=testnet):
+ * the player's deposit into the Hugshire Vault, donations to a cause's wallet, and withdrawals.
+ * step "skipped" marks an action that had no onchain position to act on (tx_hash "-").
+ */
+export const chainTxs = pgTable(
+  "chain_txs",
+  {
+    id: id(),
+    userId: uuid("user_id").references(() => users.id),
+    kind: text("kind", { enum: ["deposit", "donate", "withdraw", "pool"] }).notNull(),
+    refType: text("ref_type", { enum: ["deposit", "delivery", "withdrawal", "pool_payout"] }).notNull(),
+    refId: uuid("ref_id").notNull(),
+    step: text("step").notNull(),
+    txHash: text("tx_hash").notNull(),
+    account: text("account"),
+    note: text("note"),
+    amountMicro: micro("amount_micro"),
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex("chain_tx_ref_step").on(t.refType, t.refId, t.step), index("chain_tx_user_idx").on(t.userId)],
+);

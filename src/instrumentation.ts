@@ -10,4 +10,9 @@ export async function register() {
   const { defaultCtx } = await import("./server/services/context");
   startScheduler(defaultCtx, (m) => console.log(m));
   console.log("[hugshire] sandbox scheduler running in-process");
+  // demo onchain mode: mirror deposits, donations and withdrawals as NEAR testnet transactions
+  if (process.env.CHAIN_MODE === "testnet") {
+    const { startChainSync } = await import("./server/services/chain-sync");
+    startChainSync(defaultCtx, (m) => console.log(m));
+  }
 }

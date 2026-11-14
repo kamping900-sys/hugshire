@@ -817,6 +817,7 @@ function TreePanel({ tree, town, towns, onChanged, flash }: { tree: Tree; town: 
                 <button onClick={() => window.dispatchEvent(new CustomEvent("hs:plant-more"))} className={`${btnP} py-3`}>🌱 Plant more</button>
                 <button onClick={() => setWd((w) => ({ ...w, open: !w.open, msg: null }))} className={`${btn} py-3`}>↩️ Withdraw</button>
               </div>
+              <OnchainCard />
               {wd.open && (
                 <div className="hs-fade fixed inset-0 z-[60] flex items-center justify-center bg-[rgba(28,18,12,0.55)] p-4" onClick={(e) => e.target === e.currentTarget && setWd({ open: false, amount: "", busy: false, msg: null, done: null })}>
                   {wd.done ? (
@@ -1010,6 +1011,65 @@ function GiftRow({ g, towns, homeId, homeName, onChanged, flash }: { g: Golden; 
         </div>
       )}
       {g.simulated && <div className="mt-2 text-[10px] font-bold text-[#9A887A]">Test mode: this gift is simulated.</div>}
+    </div>
+  );
+}
+
+type ChainView = {
+  enabled: boolean;
+  wallet?: { account: string; url: string; exists: boolean };
+  vault?: { account: string; url: string };
+  onchain?: { principalMicro: string; donatedMicro: string; walletUsdcMicro: string; yieldMicro: string } | null;
+  txs?: { kind: string; step: string; note: string | null; amountMicro: string | null; hash: string; url: string; at: string }[];
+};
+const TX_LABEL: Record<string, string> = { mint: "Test USDC to your wallet", to_vault: "Deposit → Hugshire Vault", process: "Vault → RHEA lending (mock)", donate: "Donation → cause wallet", withdraw: "Withdrawal → your wallet" };
+const TOWN: Record<string, string> = { pawsbury: "Pawsbury", "inkwell-hollow": "Inkwell Hollow", fernhollow: "Fernhollow", "ladle-lane": "Ladle Lane" };
+
+/** Demo onchain mode: the player's real NEAR testnet position and transactions, with explorer links. */
+function OnchainCard() {
+  const [v, setV] = useState<ChainView | null>(null);
+  useEffect(() => {
+    let alive = true;
+    const load = () => fetch("/api/chain").then((r) => r.json()).then((j) => alive && setV(j)).catch(() => {});
+    load();
+    const t = window.setInterval(load, 8000);
+    return () => { alive = false; window.clearInterval(t); };
+  }, []);
+  if (!v?.enabled) return null;
+  const o = v.onchain;
+  return (
+    <div className="mt-2 rounded-2xl border-2 border-[#2B6FA8]/40 bg-[#EEF5FB] p-3">
+      <div className="flex items-center justify-between">
+        <div className="text-sm font-black text-[#1F4E79]">⛓️ Onchain · NEAR testnet</div>
+        <span className="rounded-full bg-[#2B6FA8] px-2 py-0.5 text-[10px] font-black text-white">LIVE TXS</span>
+      </div>
+      {o ? (
+        <div className="mt-2 grid grid-cols-3 gap-1.5 text-center">
+          {[["In the Vault", o.principalMicro], ["Donated onchain", o.donatedMicro], ["Back in wallet", o.walletUsdcMicro]].map(([l, m]) => (
+            <div key={l} className="rounded-xl bg-white px-1 py-1.5">
+              <div className="num text-sm font-black text-[#1F4E79]">{usd(m)}</div>
+              <div className="text-[10px] font-bold text-[#5B7A96]">{l}</div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-1.5 text-[11px] font-bold text-[#5B7A96]">Your deposit is being written to the chain… (about half a minute)</p>
+      )}
+      {!!v.txs?.length && (
+        <ul className="mt-2 space-y-1">
+          {v.txs.slice(0, 5).map((t) => (
+            <li key={t.hash + t.step} className="flex items-center justify-between gap-2 rounded-lg bg-white/70 px-2 py-1 text-[11px] font-bold text-[#3A4A5A]">
+              <span className="truncate">{t.step === "donate" ? `Donation → ${TOWN[t.note ?? ""] ?? "cause"} wallet` : TX_LABEL[t.step] ?? t.step}{t.amountMicro ? ` · ${usd(t.amountMicro)}` : ""}</span>
+              <a href={t.url} target="_blank" rel="noreferrer" className="shrink-0 font-black text-[#2B6FA8] underline">{t.hash.slice(0, 6)}… ↗</a>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] font-black">
+        {v.wallet?.exists && <a href={v.wallet.url} target="_blank" rel="noreferrer" className="text-[#2B6FA8] underline">Your wallet ↗</a>}
+        {v.vault && <a href={v.vault.url} target="_blank" rel="noreferrer" className="text-[#2B6FA8] underline">Vault contract ↗</a>}
+      </div>
+      <p className="mt-1.5 text-[10px] font-semibold leading-snug text-[#5B7A96]">Testnet with test USDC and a mock RHEA pool. Card payment, the bridge and bank payout are still simulated.</p>
     </div>
   );
 }

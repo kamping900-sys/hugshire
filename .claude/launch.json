@@ -17,6 +17,14 @@
         "trailer/scripts/serve.cjs"
       ],
       "port": 3300
+    },
+    {
+      "name": "chain",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "scripts/dev-chain.cjs"
+      ],
+      "port": 3400
     }
   ]
 }

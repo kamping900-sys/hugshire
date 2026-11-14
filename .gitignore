@@ -13,3 +13,6 @@ playwright-report/
 contracts/vault/target/
 next-env.d.ts
 *.tsbuildinfo
+
+# Rust build output
+contracts/target/

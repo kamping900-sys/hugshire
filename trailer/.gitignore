@@ -3,3 +3,4 @@ footage/
 build/
 .cache/
 out/*.mp4
+.cache-suffix

@@ -6,14 +6,14 @@ import { decimalToWad } from "@/lib/money";
 
 /** Minimal NEAR JSON-RPC client (view calls, tx status, signed function calls). */
 export class NearRpc {
-  constructor(private url: string) {}
+  constructor(private url: string, private timeoutMs = 20_000) {}
 
   async call<T>(method: string, params: unknown): Promise<T> {
     const res = await fetch(this.url, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ jsonrpc: "2.0", id: "hugshire", method, params }),
-      signal: AbortSignal.timeout(20_000),
+      signal: AbortSignal.timeout(this.timeoutMs),
     });
     if (!res.ok) throw new Error(`NEAR RPC HTTP ${res.status}`);
     const j = (await res.json()) as { result?: T; error?: unknown };

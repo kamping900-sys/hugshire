@@ -35,7 +35,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="min-h-dvh">
         {sandbox && (
           <div className="bg-ink px-4 py-1.5 text-center text-xs font-semibold text-cream">
-            Test mode — no real money moves. Yield is simulated from RHEA&apos;s live USDC rate.
+            {process.env.CHAIN_MODE === "testnet"
+              ? "Test mode on NEAR testnet — deposits, lending, donations and withdrawals are real testnet transactions with test USDC. No real money."
+              : "Test mode — no real money moves. Yield is simulated from RHEA's live USDC rate."}
           </div>
         )}
         <header className="sticky top-0 z-40 border-b border-line/70 bg-cream/85 backdrop-blur-md">
