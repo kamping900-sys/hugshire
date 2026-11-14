@@ -10,7 +10,7 @@ The detailed docs it draws on:
 - ARCHITECTURE, FINANCIAL_MODEL, VAULT_V2, SECURITY and WORLD_ENGINE
 - V4_GAMEPLAY_ECONOMY (gameplay and economy)
 - KNOWN_LIMITATIONS, PRODUCTION_CHECKLIST and REAL_MONEY_TEST_PLAN
-- SETUP_GUIDE, and `todo.md` for the working checklist
+- SETUP_GUIDE (setup steps and checklist)
 
 **Status labels:**
 - ✅ built and tested
@@ -575,7 +575,7 @@ Notice Board.
 
 ## 16. What's left
 
-**Blocked on you** (also in `todo.md`):
+**Blocked on you** (setup steps in `docs/SETUP_GUIDE.md`):
 - Accounts: Coinbase CDP and KYB, a Privy app, a NEAR Intents partner key, an RPC provider.
 - NEAR accounts and the Vault: a multisig owner, the Vault account, the operator account, an audit,
   and a reproducible deployment.

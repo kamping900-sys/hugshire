@@ -286,4 +286,4 @@ pays it back.
 5. **Hardening:** Content-Security-Policy, shared rate limiting, alert push, KMS for the operator
    key.
 
-See `todo.md` for the working checklist and `docs/KNOWN_LIMITATIONS.md` for the full list.
+See `docs/SETUP_GUIDE.md` for the setup steps and `docs/KNOWN_LIMITATIONS.md` for the full list.
