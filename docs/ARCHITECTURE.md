@@ -3,6 +3,11 @@
 Last verified against official sources: 2026-11-07. Sources are listed in
 [SETUP_GUIDE.md](SETUP_GUIDE.md#sources-verified). Re-check them before going live.
 
+> **Current state (November 2026):** the Vault and the deposit → lending → donation → withdrawal flow
+> run on **NEAR testnet** with test USDC and a RHEA-compatible lending contract
+> ([ONCHAIN_TESTNET.md](ONCHAIN_TESTNET.md)). The mainnet route below is integrated and awaits launch.
+> The full current design is in [HUGSHIRE_SYSTEM.md](HUGSHIRE_SYSTEM.md).
+
 ## 1. Decision in one paragraph
 
 Hugshire is one Next.js app (UI plus API routes) with one background worker, one
@@ -105,10 +110,10 @@ never reads or writes sandbox records.
 
 | Financial truth (server, ledger, chain) | Presentation (client, PixiJS) |
 |---|---|
-| deposits, principal, withdrawals | helper walking, chopping, mining |
+| deposits, principal, withdrawals | helper walking, chopping Wood |
 | yield snapshots and allocations | "heart parcels" in the reward pool |
 | eligible yield, deliveries, payouts | carrying a parcel to a cause sign |
-| fees, failures, reversals | buildings rising with the city's stage |
+| fees, failures, reversals | buildings rising through construction stages |
 
 - The client never sends an amount. A delivery request carries only `causeId`,
   `helperId` and an idempotency key. The server takes the supporter's eligible
@@ -135,13 +140,9 @@ largest-remainder method, so the parts always add up exactly to the total.
 
 ## 8. Data model (main tables)
 
-`users, user_profiles, sessions, organizations, organization_members,
-organization_verifications, causes, cities, cause_updates, helpers,
-helper_preferences, deposits, support_positions, onramp_transactions,
-bridge_transactions, lending_positions, yield_snapshots, yield_allocations,
-deliveries (pending → queued → paid), delivery_allocations, charity_payouts,
-payout_items, withdrawals, ledger_journals, ledger_entries, audit_logs,
-admin_actions, webhook_events, system_alerts, platform_settings, jobs`
+45 tables, grouped by area in [HUGSHIRE_SYSTEM.md §10](HUGSHIRE_SYSTEM.md#10-data-model-45-tables): accounts,
+organisations and causes, helpers, deposits and providers, yield and delivery, ledger and operations,
+construction, Community Pool, and the onchain mirror (`chain_txs`).
 
 See `src/server/db/schema.ts`.
 

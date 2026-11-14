@@ -1,5 +1,10 @@
 # Hugshire: project overview (2026-11-10)
 
+> **Historical snapshot.** Parts of this document predate later changes (for example the Stone mini-game
+> was removed and rewards were rescaled). The current reference is [HUGSHIRE_SYSTEM.md](HUGSHIRE_SYSTEM.md);
+> the hackathon overview is the [README](../README.md).
+
+
 Where kindness takes shape. This is the one-page map of the project:
 - what is built;
 - how the money moves;

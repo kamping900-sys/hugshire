@@ -1,5 +1,10 @@
 # Hugshire: complete project summary (2026-11-11)
 
+> **Historical snapshot.** Parts of this document predate later changes (for example the Stone mini-game
+> was removed and rewards were rescaled). The current reference is [HUGSHIRE_SYSTEM.md](HUGSHIRE_SYSTEM.md);
+> the hackathon overview is the [README](../README.md).
+
+
 **Where kindness takes shape.**
 
 Hugshire is a cozy multiplayer town-building game that is funded by real charitable DeFi yield.

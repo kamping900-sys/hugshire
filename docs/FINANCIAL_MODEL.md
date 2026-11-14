@@ -132,5 +132,15 @@ Failures raise deduplicated alerts that auto-resolve when the check passes again
 - `per_tree = floor((budget + carry_in) ÷ eligible)`.
 - None of these journals touch `user:*`, `cause:*:yield_*` or `pool:lending`.
 
-Wood and Stone are not in the ledger at all: they are virtual (`construction_projects`,
-`resource_contributions`).
+Wood is not in the ledger at all: it is virtual (`construction_projects`, `resource_contributions`).
+
+## Revenue configuration
+
+- **Lending yield:** today 100% of distributable yield is allocated to supporters and delivered to the causes
+  they choose. No platform share is taken in the Vault or the ledger. A disclosed platform share is the planned
+  commercial model; its rate is to be determined. See [BUSINESS_MODEL.md](BUSINESS_MODEL.md).
+- **Advertising:** the pool budget is `floor(received revenue × poolCharityBps ÷ 10,000)`. The remainder is not
+  allocated to charity. `poolCharityBps` is an admin setting; it is currently unset (0), so finalising a month
+  is refused until a share is published.
+- **Onchain mirror (testnet):** `chain_txs` records the NEAR testnet transaction behind each deposit, donation,
+  withdrawal and pool payout ([ONCHAIN_TESTNET.md](ONCHAIN_TESTNET.md)).
